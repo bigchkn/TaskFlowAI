@@ -3,7 +3,7 @@ use uuid::Uuid;
 use chrono::{DateTime, Utc};
 use indexmap::IndexMap;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum Status {
     Backlog,
@@ -15,14 +15,14 @@ pub enum Status {
     Canceled,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum TaskType {
     Feature,
     Bug,
     Chore,
     Research,
-    Milestone,
+    Task, // General task
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -36,18 +36,20 @@ pub struct Execution {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
-    pub id: String,           // Human-readable ID (e.g., TF-1, 1.1)
+    pub id: String,           // Human-readable ID (e.g., TF-1)
     pub uid: Uuid,            // Immutable internal ID
     pub title: String,
     pub description: String,
     pub task_type: TaskType,
     pub status: Status,
     #[serde(default)]
-    pub priority: u8,         // 0-255, higher is more urgent
+    pub priority: u8,         
     
     pub parent_id: Option<Uuid>,
     #[serde(default)]
     pub subtask_uids: Vec<Uuid>,
+    
+    pub milestone_id: Option<String>, // ID of the milestone fragment (e.g., "M1")
     
     #[serde(default)]
     pub tags: Vec<String>,
@@ -60,7 +62,17 @@ pub struct Task {
     pub execution: Execution,
     
     #[serde(default)]
-    pub metadata: IndexMap<String, String>, // Flexible AI context
+    pub metadata: IndexMap<String, String>, 
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MilestoneMetadata {
+    pub id: String,          // e.g., "M1"
+    pub name: String,
+    pub description: String,
+    pub target_date: Option<DateTime<Utc>>,
+    pub status: Status,
+    pub path: String,        // e.g., "roadmap/M1.toml"
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -68,6 +80,15 @@ pub struct Project {
     pub name: String,
     pub description: String,
     pub version: String,
+    pub milestones: Vec<MilestoneMetadata>,
+    #[serde(default)]
+    pub archived_milestones: Vec<MilestoneMetadata>,
+    pub backlog_path: String, // e.g., "roadmap/backlog.toml"
+}
+
+/// A fragment containing a collection of tasks (Milestone or Backlog)
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct TaskFragment {
     pub tasks: Vec<Task>,
 }
 
@@ -84,6 +105,7 @@ impl Task {
             priority: 0,
             parent_id: None,
             subtask_uids: Vec::new(),
+            milestone_id: None,
             tags: Vec::new(),
             created_at: now,
             updated_at: now,
