@@ -37,3 +37,30 @@ updated_at = "2026-05-02T18:41:20.729419Z"
 logs = []
 
 [tasks.metadata]
+
+[[tasks]]
+id = "TF-10"
+uid = "b245bc89-2502-4cae-9266-9b8fe11f221e"
+title = "Implement next command for task prioritization"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M2"
+tags = []
+created_at = "2026-05-02T18:43:14.889994Z"
+updated_at = "2026-05-02T18:43:59.953414Z"
+completed_at = "2026-05-02T18:43:59.953415Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M2/TF-10/lld-next-command-implementation.md"
+status = "draft"
+created_at = "2026-05-02T18:43:23.154098Z"
+updated_at = "2026-05-02T18:43:23.154098Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
