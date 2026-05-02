@@ -1,0 +1,43 @@
+name = "TaskFlowAI Core"
+description = ""
+version = "0.1.0"
+archived_milestones = []
+backlog_path = "roadmap/backlog.toml"
+
+[[milestones]]
+id = "M1"
+name = "Design Phase"
+description = ""
+status = "todo"
+path = "roadmap/M1.toml"
+
+[[milestones.designs]]
+design_type = "hld"
+path = "docs/designs/M1/hld-architecture-overview.md"
+status = "approved"
+created_at = "2026-05-02T18:29:47.021056Z"
+updated_at = "2026-05-02T18:30:23.033161Z"
+
+[[milestones]]
+id = "M2"
+name = "Core Commands & Refinement"
+description = ""
+status = "todo"
+path = "roadmap/M2.toml"
+designs = []
+
+[[milestones]]
+id = "M3"
+name = "Advanced Features"
+description = ""
+status = "todo"
+path = "roadmap/M3.toml"
+designs = []
+
+[[milestones]]
+id = "M4"
+name = "Self-Hosting & Validation"
+description = ""
+status = "todo"
+path = "roadmap/M4.toml"
+designs = []

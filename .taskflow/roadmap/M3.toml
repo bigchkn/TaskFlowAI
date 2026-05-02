@@ -1,0 +1,19 @@
+[[tasks]]
+id = "TF-8"
+uid = "d603ed01-60ac-4999-9fa7-fbc41c211c73"
+title = "Implement hierarchical subtask support (--parent flag)"
+description = ""
+task_type = "feature"
+status = "backlog"
+priority = 0
+subtask_uids = []
+milestone_id = "M3"
+designs = []
+tags = []
+created_at = "2026-05-02T18:41:20.742559Z"
+updated_at = "2026-05-02T18:41:20.742559Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

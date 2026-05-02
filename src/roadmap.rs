@@ -31,9 +31,10 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
 
             let fragment = storage.load_fragment(&ms.path)?;
             for task in &fragment.tasks {
+                let check = if task.status == crate::model::Status::Done { "x" } else { " " };
                 active_md.push_str(&format!(
-                    "- [ ] **{}**: {} (`{:?}`)\n",
-                    task.id, task.title, task.status
+                    "- [{}] **{}**: {} (`{:?}`)\n",
+                    check, task.id, task.title, task.status
                 ));
                 for design in &task.designs {
                     active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
@@ -49,9 +50,10 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
         active_md.push_str("_Backlog is empty._\n\n");
     } else {
         for task in &backlog.tasks {
+            let check = if task.status == crate::model::Status::Done { "x" } else { " " };
             active_md.push_str(&format!(
-                "- [ ] **{}**: {} (`{:?}`)\n",
-                task.id, task.title, task.status
+                "- [{}] **{}**: {} (`{:?}`)\n",
+                check, task.id, task.title, task.status
             ));
             for design in &task.designs {
                 active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));

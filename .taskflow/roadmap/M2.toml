@@ -1,0 +1,39 @@
+[[tasks]]
+id = "TF-6"
+uid = "72b82b7a-168e-473e-9267-f30670f0320d"
+title = "Implement move command (Backlog to Milestone)"
+description = ""
+task_type = "feature"
+status = "backlog"
+priority = 0
+subtask_uids = []
+milestone_id = "M2"
+designs = []
+tags = []
+created_at = "2026-05-02T18:41:20.716299Z"
+updated_at = "2026-05-02T18:41:20.716299Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-7"
+uid = "85d42e68-d237-4fe9-86b5-b9272987a576"
+title = "Implement edit command (Interactive TOML editing)"
+description = ""
+task_type = "feature"
+status = "backlog"
+priority = 0
+subtask_uids = []
+milestone_id = "M2"
+designs = []
+tags = []
+created_at = "2026-05-02T18:41:20.729419Z"
+updated_at = "2026-05-02T18:41:20.729419Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

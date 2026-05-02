@@ -25,5 +25,4 @@ target
 
 /target
 .temp/
-.taskflow/roadmap/
-.taskflow/archive/
+# .taskflow/roadmap/ and .taskflow/archive/ should be committed for Git-native storage
