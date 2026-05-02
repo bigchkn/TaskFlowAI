@@ -1,6 +1,11 @@
-use anyhow::Result;
+use anyhow::{Result, bail, Context};
+use std::fs;
+use crate::SkillCommands;
 
-pub const TASKFLOW_SKILL_PROMPT: &str = r#"
+pub const TASKFLOW_SKILL_PROMPT: &str = r#"---
+name: taskflow
+description: TaskFlowAI agent skill for hierarchical task management and design synchronization.
+---
 # TaskFlowAI Agent Skill
 
 You are an AI agent operating within a TaskFlowAI managed project. Your goal is to manage tasks and designs while maintaining the strict decoupling of machine-readable metadata and human-readable documentation.
@@ -31,7 +36,33 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 - `ROADMAP_ACTIVE.md`: The generated project view.
 "#;
 
-pub fn run() -> Result<()> {
-    println!("{}", TASKFLOW_SKILL_PROMPT);
+pub fn run(command: Option<SkillCommands>) -> Result<()> {
+    let cmd = command.unwrap_or(SkillCommands::View);
+
+    match cmd {
+        SkillCommands::View => {
+            println!("{}", TASKFLOW_SKILL_PROMPT);
+        }
+        SkillCommands::Install { provider } => {
+            let home = std::env::var("HOME").context("Could not find HOME environment variable")?;
+            
+            let skill_path = match provider.to_lowercase().as_str() {
+                "claude" => format!("{}/.claude/skills/taskflow/SKILL.md", home),
+                "gemini" => format!("{}/.gemini/skills/taskflow/SKILL.md", home),
+                "codex" => format!("{}/.codex/skills/taskflow/SKILL.md", home),
+                "dirac" => format!("{}/.dirac/skills/taskflow/SKILL.md", home),
+                "opencode" => format!("{}/.config/opencode/skill/taskflow/SKILL.md", home),
+                _ => bail!("Unsupported provider: {}. Supported providers are: claude, gemini, codex, dirac, opencode", provider),
+            };
+
+            let path = std::path::Path::new(&skill_path);
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent).with_context(|| format!("Failed to create directory: {:?}", parent))?;
+            }
+
+            fs::write(path, TASKFLOW_SKILL_PROMPT).with_context(|| format!("Failed to write skill to: {:?}", path))?;
+            println!("Successfully installed TaskFlowAI skill to {}", skill_path);
+        }
+    }
     Ok(())
 }

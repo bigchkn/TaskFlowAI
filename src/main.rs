@@ -67,8 +67,11 @@ enum Commands {
     /// Suggest the next task to work on
     Next,
 
-    /// Output AI agent instructions for TaskFlowAI workflow
-    Skill,
+    /// Manage the TaskFlowAI agent skill
+    Skill {
+        #[command(subcommand)]
+        command: Option<SkillCommands>,
+    },
 
     /// Move a task to a specific milestone
     Move {
@@ -89,6 +92,13 @@ enum Commands {
     Sync,
     /// Show project dashboard
     Dashboard,
+    /// Show detailed information about a task
+    Show { task_id: String },
+    /// Get or set project-level configuration
+    Config {
+        key: String,
+        value: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -139,6 +149,17 @@ enum DesignCommands {
         milestone: String,
         #[arg(short, long)]
         task: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum SkillCommands {
+    /// View the skill prompt (default)
+    View,
+    /// Install the skill for a specific AI provider
+    Install {
+        /// The AI provider (claude, gemini, codex, dirac, opencode)
+        provider: String,
     },
 }
 
@@ -209,12 +230,14 @@ fn main() -> Result<()> {
         },
         Commands::Validate { task_id } => commands::validate(&storage, task_id),
         Commands::Next => commands::next(&storage),
-        Commands::Skill => commands::skill(),
+        Commands::Skill { command } => commands::skill(command),
         Commands::Move {
             task_id,
             milestone,
         } => commands::move_task(&storage, task_id, milestone),
         Commands::Delete { task_id } => commands::delete(&storage, task_id),
         Commands::Edit { task_id } => commands::edit(&storage, task_id),
+        Commands::Show { task_id } => commands::show(&storage, task_id),
+        Commands::Config { key, value } => commands::config(&storage, key, value),
     }
 }

@@ -36,13 +36,21 @@
 
 - [x] **TF-8**: Implement hierarchical subtask support (--parent flag)(`Done`)
   - [Lld] docs/designs/M3/TF-8/lld-hierarchical-subtask-support.md (`Draft`)
-- [ ] **TF-13**: Architectural Refactoring(`Backlog`)
+- [x] **TF-13**: Architectural Refactoring(`Done`)
   - [ ] **TF-14**: Refactor storage layer (Parent: TF-13)(`Backlog`)
+  - [x] **TF-15**: Refactor main.rs into modular command handlers (Parent: TF-13)(`Done`)
+    - [Lld] docs/designs/M3/TF-15/lld-refactor-main.rs.md (`Draft`)
 
 ### Self-Hosting & Validation (M4)
 **Status:** Todo
 
-- [ ] **TF-9**: Dogfood TaskFlowAI on its own repository development(`Backlog`)
+- [x] **TF-9**: Dogfood TaskFlowAI on its own repository development(`Done`)
+
+### Provider Skills Integration (M5)
+**Status:** Todo
+
+- [x] **TF-17**: Refine skill command with view and install subcommands(`Done`)
+  - [Lld] docs/designs/M5/TF-17/lld-skill-command-refinement.md (`Approved`)
 
 ## Backlog
 

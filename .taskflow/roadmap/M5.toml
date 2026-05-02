@@ -1,0 +1,29 @@
+[[tasks]]
+id = "TF-17"
+uid = "6f526ad9-9b0b-4093-862e-ee0503171657"
+title = "Refine skill command with view and install subcommands"
+description = "Refactored skill command to support 'view' and 'install <provider>' for global skill deployment."
+task_type = "feature"
+status = "done"
+priority = 0
+milestone_id = "M5"
+tags = []
+created_at = "2026-05-02T20:15:00.000000Z"
+updated_at = "2026-05-02T20:45:00.000000Z"
+completed_at = "2026-05-02T20:45:00.000000Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M5/TF-17/lld-skill-command-refinement.md"
+status = "approved"
+created_at = "2026-05-02T20:15:00.000000Z"
+updated_at = "2026-05-02T20:45:00.000000Z"
+
+[tasks.execution]
+agent_id = "Gemini CLI"
+start_time = "2026-05-02T20:15:00.000000Z"
+end_time = "2026-05-02T20:45:00.000000Z"
+logs = ["Implemented skill subcommands and global provider installation logic."]
+outcome = "success"
+
+[tasks.metadata]

@@ -2,6 +2,7 @@ use crate::model::{Project, Task, TaskFragment};
 use anyhow::{Result, Context};
 use std::path::PathBuf;
 use std::fs;
+use indexmap::IndexMap;
 
 pub trait Storage {
     fn load_project(&self) -> Result<Project>;
@@ -53,6 +54,7 @@ impl Storage for FileStorage {
                 milestones: Vec::new(),
                 archived_milestones: Vec::new(),
                 backlog_path: "roadmap/backlog.toml".to_string(),
+                config: IndexMap::new(),
             });
         }
         let content = fs::read_to_string(&path)

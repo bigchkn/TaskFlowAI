@@ -4,6 +4,7 @@ use crate::roadmap;
 use crate::model::TaskFragment;
 use anyhow::Result;
 use std::env;
+use indexmap::IndexMap;
 
 pub fn run<S: Storage>(storage: &S, name: String) -> Result<()> {
     let project = Project {
@@ -13,6 +14,7 @@ pub fn run<S: Storage>(storage: &S, name: String) -> Result<()> {
         milestones: Vec::new(),
         archived_milestones: Vec::new(),
         backlog_path: "roadmap/backlog.toml".to_string(),
+        config: IndexMap::new(),
     };
     storage.save_project(&project)?;
     storage.save_fragment(&project.backlog_path, &TaskFragment::default())?;

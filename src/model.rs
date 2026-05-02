@@ -115,6 +115,9 @@ pub struct Project {
     #[serde(default)]
     pub archived_milestones: Vec<MilestoneMetadata>,
     pub backlog_path: String, // e.g., "roadmap/backlog.toml"
+    
+    #[serde(default)]
+    pub config: IndexMap<String, String>,
 }
 
 /// A fragment containing a collection of tasks (Milestone or Backlog)

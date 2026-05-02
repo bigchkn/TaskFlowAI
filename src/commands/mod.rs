@@ -16,6 +16,9 @@ pub mod meta;
 pub mod validate;
 pub mod init;
 
+pub mod show;
+pub mod config;
+
 pub use add::run as add;
 pub use list::run as list;
 pub use status::run as status;
@@ -36,3 +39,5 @@ pub use milestone::list as milestone_list;
 pub use meta::set as meta_set;
 pub use validate::run as validate;
 pub use init::run as init;
+pub use show::run as show;
+pub use config::run as config;

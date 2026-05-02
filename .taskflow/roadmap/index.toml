@@ -41,3 +41,14 @@ description = ""
 status = "todo"
 path = "roadmap/M4.toml"
 designs = []
+
+[[milestones]]
+id = "M5"
+name = "Provider Skills Integration"
+description = ""
+status = "todo"
+path = "roadmap/M5.toml"
+designs = []
+
+[config]
+default_template = "feature.toml"
