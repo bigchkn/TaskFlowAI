@@ -91,3 +91,31 @@ updated_at = "2026-05-02T18:52:32.554087Z"
 logs = []
 
 [tasks.metadata]
+
+[[tasks]]
+id = "TF-12"
+uid = "09a578c6-0c67-42fc-bf64-ded512c5ec35"
+title = "Implement 'skill' command for AI workflow instruction"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M2"
+tags = []
+created_at = "2026-05-02T18:55:15.206537Z"
+updated_at = "2026-05-02T18:55:45.525698Z"
+completed_at = "2026-05-02T18:55:45.525699Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M2/TF-12/lld-skill-command-for-ai-instruction.md"
+status = "draft"
+created_at = "2026-05-02T18:55:17.585437Z"
+updated_at = "2026-05-02T18:55:17.585437Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+priority = "10"
