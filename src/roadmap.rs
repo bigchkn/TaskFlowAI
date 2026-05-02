@@ -21,12 +21,23 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
             }
             active_md.push_str(&format!("**Status:** {:?}\n\n", ms.status));
 
+            if !ms.designs.is_empty() {
+                active_md.push_str("**Designs:**\n");
+                for design in &ms.designs {
+                    active_md.push_str(&format!("- [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                }
+                active_md.push_str("\n");
+            }
+
             let fragment = storage.load_fragment(&ms.path)?;
             for task in &fragment.tasks {
                 active_md.push_str(&format!(
                     "- [ ] **{}**: {} (`{:?}`)\n",
                     task.id, task.title, task.status
                 ));
+                for design in &task.designs {
+                    active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                }
             }
             active_md.push_str("\n");
         }
@@ -42,6 +53,9 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
                 "- [ ] **{}**: {} (`{:?}`)\n",
                 task.id, task.title, task.status
             ));
+            for design in &task.designs {
+                active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+            }
         }
     }
 
@@ -58,12 +72,23 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
             archive_md.push_str(&format!("### {} ({})\n", ms.name, ms.id));
             archive_md.push_str(&format!("**Status:** {:?}\n\n", ms.status));
 
+            if !ms.designs.is_empty() {
+                archive_md.push_str("**Designs:**\n");
+                for design in &ms.designs {
+                    archive_md.push_str(&format!("- [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                }
+                archive_md.push_str("\n");
+            }
+
             let fragment = storage.load_fragment(&ms.path)?;
             for task in &fragment.tasks {
                 archive_md.push_str(&format!(
                     "- [x] **{}**: {} (`{:?}`)\n",
                     task.id, task.title, task.status
                 ));
+                for design in &task.designs {
+                    archive_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                }
             }
             archive_md.push_str("\n");
         }

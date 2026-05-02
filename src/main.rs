@@ -3,11 +3,15 @@ mod roadmap;
 mod storage;
 mod validation;
 
-use crate::model::{MilestoneMetadata, Project, Status, Task, TaskFragment, TaskType};
+use crate::model::{
+    Design, DesignStatus, DesignType, MilestoneMetadata, Project, Status, Task, TaskFragment,
+    TaskType,
+};
 use crate::storage::{FileStorage, Storage};
 use anyhow::{Context, Result};
 use chrono::Utc;
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 
 // ... (Cli and Commands enums)
 
@@ -56,8 +60,14 @@ enum Commands {
         #[command(subcommand)]
         command: MetaCommands,
     },
+    /// Design document management
+    Design {
+        #[command(subcommand)]
+        command: DesignCommands,
+    },
     /// Validate a task against its template requirements
     Validate { task_id: String },
+
     /// Archive a completed milestone
     Archive { milestone_id: String },
     /// Sync and regenerate Markdown roadmap files
@@ -96,6 +106,28 @@ enum ExecuteCommands {
 }
 
 #[derive(Subcommand)]
+enum DesignCommands {
+    /// Initialize a new design document
+    Init {
+        design_type: String, // hld or lld
+        title: String,
+        #[arg(short, long)]
+        milestone: String,
+        #[arg(short, long)]
+        task: Option<String>,
+    },
+    /// Update the status of a design document
+    Status {
+        path: String,
+        status: String,
+        #[arg(short, long)]
+        milestone: String,
+        #[arg(short, long)]
+        task: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
 enum MetaCommands {
     /// Set a metadata key-value pair
     Set {
@@ -103,6 +135,25 @@ enum MetaCommands {
         key: String,
         value: String,
     },
+}
+
+fn parse_design_type(s: &str) -> Result<DesignType> {
+    match s.to_lowercase().as_str() {
+        "hld" => Ok(DesignType::Hld),
+        "lld" => Ok(DesignType::Lld),
+        "rfc" => Ok(DesignType::Rfc),
+        _ => Err(anyhow::anyhow!("Unknown design type: {}", s)),
+    }
+}
+
+fn parse_design_status(s: &str) -> Result<DesignStatus> {
+    match s.to_lowercase().as_str() {
+        "draft" => Ok(DesignStatus::Draft),
+        "review" => Ok(DesignStatus::Review),
+        "approved" => Ok(DesignStatus::Approved),
+        "deprecated" => Ok(DesignStatus::Deprecated),
+        _ => Err(anyhow::anyhow!("Unknown design status: {}", s)),
+    }
 }
 
 fn parse_status(s: &str) -> Result<Status> {
@@ -231,10 +282,6 @@ fn main() -> Result<()> {
             roadmap::generate_roadmaps(&storage, &project_root)?;
             println!("Updated task {} status to {:?}", task_id, status);
         }
-        Commands::Validate { task_id } => {
-            let project_root = std::env::current_dir()?;
-            validation::validate_task(&storage, &project_root, &task_id)?;
-        }
         Commands::Archive { milestone_id } => {
             let mut project = storage.load_project()?;
             let index = project
@@ -314,6 +361,7 @@ fn main() -> Result<()> {
                     target_date: None,
                     status: Status::Todo,
                     path: path.clone(),
+                    designs: Vec::new(),
                 });
                 storage.save_project(&project)?;
                 storage.save_fragment(&path, &TaskFragment::default())?;
@@ -378,6 +426,109 @@ fn main() -> Result<()> {
                 println!("Set metadata for task {}", task_id);
             }
         },
+        Commands::Design { command } => match command {
+            DesignCommands::Init {
+                design_type,
+                title,
+                milestone,
+                task,
+            } => {
+                let d_type = parse_design_type(&design_type)?;
+                let now = Utc::now();
+                let project_root = std::env::current_dir()?;
+
+                // Determine path: docs/designs/<milestone>[/<task>]/<type>-<title>.md
+                let mut relative_path = PathBuf::from("docs/designs");
+                relative_path.push(&milestone);
+                if let Some(ref t_id) = task {
+                    relative_path.push(t_id);
+                }
+                let filename = format!("{}-{}.md", design_type.to_lowercase(), title.to_lowercase().replace(" ", "-"));
+                relative_path.push(filename);
+                
+                let full_path = project_root.join(&relative_path);
+                if !full_path.exists() {
+                    if let Some(parent) = full_path.parent() {
+                        std::fs::create_dir_all(parent)?;
+                    }
+                    // Try to load template
+                    let template_path = project_root.join(format!(".taskflow/templates/designs/{}.md", design_type.to_lowercase()));
+                    let mut content = if template_path.exists() {
+                        std::fs::read_to_string(template_path)?
+                    } else {
+                        format!("# Design: {}\n\nType: {}\n", title, design_type)
+                    };
+                    content = content.replace("{TITLE}", &title);
+                    std::fs::write(&full_path, content)?;
+                    println!("Scaffolded design document at {:?}", relative_path);
+                }
+
+                let design = Design {
+                    design_type: d_type,
+                    path: relative_path.to_string_lossy().to_string(),
+                    status: DesignStatus::Draft,
+                    created_at: now,
+                    updated_at: now,
+                };
+
+                if let Some(ref t_id) = task {
+                    storage.update_task(t_id, |t| {
+                        t.designs.push(design);
+                        t.updated_at = now;
+                        Ok(())
+                    })?;
+                } else {
+                    storage.update_milestone(&milestone, |m| {
+                        m.designs.push(design);
+                        Ok(())
+                    })?;
+                }
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Registered design for {} {}", if task.is_some() { "task" } else { "milestone" }, if let Some(ref t_id) = task { t_id } else { &milestone });
+            }
+            DesignCommands::Status {
+                path,
+                status,
+                milestone,
+                task,
+            } => {
+                let d_status = parse_design_status(&status)?;
+                let now = Utc::now();
+                if let Some(t_id) = task {
+                    storage.update_task(&t_id, |t| {
+                        if let Some(d) = t.designs.iter_mut().find(|d| d.path == path) {
+                            d.status = d_status;
+                            d.updated_at = now;
+                            t.updated_at = now;
+                            Ok(())
+                        } else {
+                            Err(anyhow::anyhow!("Design not found at path {} in task {}", path, t_id))
+                        }
+                    })?;
+                } else {
+                    storage.update_milestone(&milestone, |m| {
+                        if let Some(d) = m.designs.iter_mut().find(|d| d.path == path) {
+                            d.status = d_status;
+                            d.updated_at = now;
+                            Ok(())
+                        } else {
+                            Err(anyhow::anyhow!("Design not found at path {} in milestone {}", path, milestone))
+                        }
+                    })?;
+                }
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Updated design status to {:?}", d_status);
+            }
+        },
+        Commands::Validate { task_id } => {
+            let project_root = std::env::current_dir()?;
+            // Check if it's a milestone or task. For now, let's try task first, then milestone.
+            if let Err(_) = validation::validate_task(&storage, &project_root, &task_id) {
+                 validation::validate_milestone(&storage, &project_root, &task_id)?;
+            }
+        }
     }
 
     Ok(())
