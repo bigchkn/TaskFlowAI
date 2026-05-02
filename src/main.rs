@@ -17,6 +17,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "taskflow-ai")]
+#[command(version = "0.1.0")]
 #[command(about = "Task Management system designed for AI collaboration", long_about = None)]
 struct Cli {
     #[command(subcommand)]
