@@ -11,7 +11,10 @@ use crate::storage::{FileStorage, Storage};
 use anyhow::{Context, Result};
 use chrono::Utc;
 use clap::{Parser, Subcommand};
+use std::env;
+use std::fs;
 use std::path::PathBuf;
+use std::process::Command;
 
 const TASKFLOW_SKILL_PROMPT: &str = r#"
 # TaskFlowAI Agent Skill
@@ -105,6 +108,19 @@ enum Commands {
 
     /// Output AI agent instructions for TaskFlowAI workflow
     Skill,
+
+    /// Move a task to a specific milestone
+    Move {
+        task_id: String,
+        #[arg(short, long)]
+        milestone: String,
+    },
+
+    /// Delete a task
+    Delete { task_id: String },
+
+    /// Edit a task interactively
+    Edit { task_id: String },
 
     /// Archive a completed milestone
     Archive { milestone_id: String },
@@ -641,6 +657,123 @@ fn main() -> Result<()> {
         }
         Commands::Skill => {
             println!("{}", TASKFLOW_SKILL_PROMPT);
+        }
+        Commands::Move {
+            task_id,
+            milestone,
+        } => {
+            let project = storage.load_project()?;
+            let source_path = storage.find_task_path(&task_id)?;
+
+            let target_milestone = project
+                .milestones
+                .iter()
+                .find(|m| m.id == milestone || m.name == milestone)
+                .context(format!("Milestone {} not found", milestone))?;
+
+            let target_path = target_milestone.path.clone();
+
+            if source_path == target_path {
+                println!("Task {} is already in milestone {}", task_id, milestone);
+                return Ok(());
+            }
+
+            // Load fragments
+            let mut source_fragment = storage.load_fragment(&source_path)?;
+            let mut target_fragment = storage.load_fragment(&target_path)?;
+
+            // Extract task
+            let task_index = source_fragment
+                .tasks
+                .iter()
+                .position(|t| t.id == task_id)
+                .unwrap();
+            let mut task = source_fragment.tasks.remove(task_index);
+
+            // Update status if moving from backlog to milestone
+            if task.status == Status::Backlog {
+                task.status = Status::Todo;
+            }
+
+            // Add to target
+            target_fragment.tasks.push(task);
+
+            // Save
+            storage.save_fragment(&source_path, &source_fragment)?;
+            storage.save_fragment(&target_path, &target_fragment)?;
+
+            // Sync roadmap
+            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
+
+            println!("Moved task {} to milestone {}", task_id, milestone);
+        }
+        Commands::Delete { task_id } => {
+            let path = storage.find_task_path(&task_id)?;
+
+
+            let mut fragment = storage.load_fragment(&path)?;
+            let task_index = fragment
+                .tasks
+                .iter()
+                .position(|t| t.id == task_id)
+                .unwrap();
+            fragment.tasks.remove(task_index);
+
+            storage.save_fragment(&path, &fragment)?;
+            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
+
+            println!("Deleted task {}", task_id);
+        }
+        Commands::Edit { task_id } => {
+            let path = storage.find_task_path(&task_id)?;
+            let mut fragment = storage.load_fragment(&path)?;
+
+            let task_index = fragment
+                .tasks
+                .iter()
+                .position(|t| t.id == task_id)
+                .unwrap();
+            let task = &fragment.tasks[task_index];
+
+            // Create temporary file
+            let temp_path = env::temp_dir().join(format!("{}.toml", task_id));
+            let task_toml = toml::to_string_pretty(task)?;
+            fs::write(&temp_path, task_toml)?;
+
+            // Open editor
+            let editor = env::var("EDITOR")
+                .or_else(|_| env::var("VISUAL"))
+                .unwrap_or_else(|_| "vi".to_string());
+
+            let status = Command::new(&editor).arg(&temp_path).status()?;
+
+            if !status.success() {
+                return Err(anyhow::anyhow!("Editor exited with failure"));
+            }
+
+            // Read back and parse
+            let edited_toml = fs::read_to_string(&temp_path)?;
+            let updated_task: Task = toml::from_str(&edited_toml)?;
+
+            if updated_task.id != task_id {
+                return Err(anyhow::anyhow!(
+                    "Task ID change is not allowed during edit ({} -> {})",
+                    task_id,
+                    updated_task.id
+                ));
+            }
+
+            // Update in fragment
+            fragment.tasks[task_index] = updated_task;
+            storage.save_fragment(&path, &fragment)?;
+
+            // Cleanup
+            let _ = fs::remove_file(&temp_path);
+
+            // Sync
+            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
+
+            println!("Updated task {}", task_id);
         }
     }
 

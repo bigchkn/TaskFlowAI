@@ -20,8 +20,18 @@
 ### Core Commands & Refinement (M2)
 **Status:** Todo
 
-- [ ] **TF-6**: Implement move command (Backlog to Milestone) (`Backlog`)
-- [ ] **TF-7**: Implement edit command (Interactive TOML editing) (`Backlog`)
+- [x] **TF-6**: Implement move command (Backlog to Milestone) (`Done`)
+  - [Lld] docs/designs/M2/TF-6/lld-move-command-implementation.md (`Draft`)
+- [x] **TF-7**: Implement edit command (Interactive TOML editing) (`Done`)
+  - [Lld] docs/designs/M2/TF-7/lld-edit-command-implementation.md (`Draft`)
+- [x] **TF-10**: Implement next command for task prioritization (`Done`)
+  - [Lld] docs/designs/M2/TF-10/lld-next-command-implementation.md (`Draft`)
+- [x] **TF-11**: Create global installer and build hook (`Done`)
+  - [Lld] docs/designs/M2/TF-11/lld-global-installer-and-build-hook.md (`Draft`)
+- [x] **TF-12**: Implement 'skill' command for AI workflow instruction (`Done`)
+  - [Lld] docs/designs/M2/TF-12/lld-skill-command-for-ai-instruction.md (`Draft`)
+- [x] **TF-14**: Implement delete command (`Done`)
+  - [Lld] docs/designs/M2/TF-14/lld-delete-command-implementation.md (`Draft`)
 
 ### Advanced Features (M3)
 **Status:** Todo

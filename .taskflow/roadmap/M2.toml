@@ -4,17 +4,28 @@ uid = "72b82b7a-168e-473e-9267-f30670f0320d"
 title = "Implement move command (Backlog to Milestone)"
 description = ""
 task_type = "feature"
-status = "backlog"
+status = "done"
 priority = 0
 subtask_uids = []
 milestone_id = "M2"
-designs = []
 tags = []
 created_at = "2026-05-02T18:41:20.716299Z"
-updated_at = "2026-05-02T18:41:20.716299Z"
+updated_at = "2026-05-02T18:59:22.625969Z"
+completed_at = "2026-05-02T18:59:22.625970Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M2/TF-6/lld-move-command-implementation.md"
+status = "draft"
+created_at = "2026-05-02T18:58:36.025404Z"
+updated_at = "2026-05-02T18:58:36.025404Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini CLI"
+start_time = "2026-05-02T18:58:34.307709Z"
+end_time = "2026-05-02T18:59:21.048402Z"
+logs = ["Implemented move command with cross-fragment task transfer and automatic roadmap sync."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -22,19 +33,30 @@ logs = []
 id = "TF-7"
 uid = "85d42e68-d237-4fe9-86b5-b9272987a576"
 title = "Implement edit command (Interactive TOML editing)"
-description = ""
+description = "Implemented interactive editing"
 task_type = "feature"
-status = "backlog"
+status = "done"
 priority = 0
 subtask_uids = []
 milestone_id = "M2"
-designs = []
 tags = []
 created_at = "2026-05-02T18:41:20.729419Z"
-updated_at = "2026-05-02T18:41:20.729419Z"
+updated_at = "2026-05-02T19:02:07.556618Z"
+completed_at = "2026-05-02T19:02:07.556618Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M2/TF-7/lld-edit-command-implementation.md"
+status = "draft"
+created_at = "2026-05-02T19:00:17.282084Z"
+updated_at = "2026-05-02T19:00:17.282084Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini CLI"
+start_time = "2026-05-02T19:00:15.509721Z"
+end_time = "2026-05-02T19:02:07.547824Z"
+logs = ["Implemented interactive edit command using external editor."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -119,3 +141,30 @@ logs = []
 
 [tasks.metadata]
 priority = "10"
+
+[[tasks]]
+id = "TF-14"
+uid = "857d6ceb-7efb-41bf-999a-ad7c95d53aea"
+title = "Implement delete command"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M2"
+tags = []
+created_at = "2026-05-02T18:59:28.113263Z"
+updated_at = "2026-05-02T18:59:53.961056Z"
+completed_at = "2026-05-02T18:59:53.961057Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M2/TF-14/lld-delete-command-implementation.md"
+status = "draft"
+created_at = "2026-05-02T18:59:28.118400Z"
+updated_at = "2026-05-02T18:59:28.118400Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

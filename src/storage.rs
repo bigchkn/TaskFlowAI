@@ -20,6 +20,8 @@ pub trait Storage {
     fn update_milestone<F>(&self, milestone_id: &str, f: F) -> Result<()>
     where
         F: FnOnce(&mut crate::model::MilestoneMetadata) -> Result<()>;
+
+    fn find_task_path(&self, task_id: &str) -> Result<String>;
 }
 
 pub struct FileStorage {
@@ -159,5 +161,25 @@ impl Storage for FileStorage {
             return Ok(());
         }
         Err(anyhow::anyhow!("Milestone {} not found", milestone_id))
+    }
+
+    fn find_task_path(&self, task_id: &str) -> Result<String> {
+        let project = self.load_project()?;
+
+        // Check backlog
+        let backlog = self.load_fragment(&project.backlog_path)?;
+        if backlog.tasks.iter().any(|t| t.id == task_id) {
+            return Ok(project.backlog_path);
+        }
+
+        // Check milestones
+        for ms in &project.milestones {
+            let fragment = self.load_fragment(&ms.path)?;
+            if fragment.tasks.iter().any(|t| t.id == task_id) {
+                return Ok(ms.path.clone());
+            }
+        }
+
+        Err(anyhow::anyhow!("Task {} not found", task_id))
     }
 }
