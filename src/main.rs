@@ -72,6 +72,8 @@ enum Commands {
         task_type: Option<String>,
         #[arg(short, long)]
         milestone: Option<String>,
+        #[arg(short, long)]
+        parent: Option<String>,
     },
     /// List all tasks
     List {
@@ -249,6 +251,7 @@ fn main() -> Result<()> {
             title,
             task_type,
             milestone,
+            parent,
         } => {
             let project = storage.load_project()?;
             let t_type = match task_type.as_deref() {
@@ -259,10 +262,43 @@ fn main() -> Result<()> {
             };
 
             let all_tasks = storage.load_all_tasks()?;
-            let next_id = format!("TF-{}", all_tasks.len() + 1);
+            let max_id = all_tasks
+                .iter()
+                .filter_map(|t| t.id.strip_prefix("TF-")?.parse::<usize>().ok())
+                .max()
+                .unwrap_or(0);
+            let next_id = format!("TF-{}", max_id + 1);
             let mut task = Task::new(next_id, title, t_type);
 
-            if let Some(ms_id) = milestone {
+            // Handle parent linkage
+            let parent_ms_id = if let Some(ref parent_id) = parent {
+                // Try to inherit milestone from parent
+                let parent_path = storage.find_task_path(parent_id)?;
+                let parent_fragment = storage.load_fragment(&parent_path)?;
+                let parent_task = parent_fragment
+                    .tasks
+                    .iter()
+                    .find(|t| t.id == *parent_id)
+                    .unwrap();
+                
+                task.parent_id = Some(parent_task.uid);
+
+                // Update parent's subtask list
+                let child_uid = task.uid;
+                storage.update_task(parent_id, |p| {
+                    p.subtask_uids.push(child_uid);
+                    Ok(())
+                })?;
+
+                parent_task.milestone_id.clone()
+            } else {
+                None
+            };
+
+            // Use explicitly provided milestone or inherited one
+            let final_ms_id = milestone.or(parent_ms_id);
+
+            if let Some(ms_id) = final_ms_id {
                 let ms_meta = project
                     .milestones
                     .iter()
@@ -276,9 +312,10 @@ fn main() -> Result<()> {
                 let project_root = std::env::current_dir()?;
                 roadmap::generate_roadmaps(&storage, &project_root)?;
                 println!(
-                    "Added task {} to milestone {}",
+                    "Added task {} to milestone {} (Parent: {:?})",
                     fragment.tasks.last().unwrap().id,
-                    ms_id
+                    ms_id,
+                    parent
                 );
             } else {
                 let mut fragment = storage.load_fragment(&project.backlog_path)?;
@@ -287,8 +324,9 @@ fn main() -> Result<()> {
                 let project_root = std::env::current_dir()?;
                 roadmap::generate_roadmaps(&storage, &project_root)?;
                 println!(
-                    "Added task {} to backlog",
-                    fragment.tasks.last().unwrap().id
+                    "Added task {} to backlog (Parent: {:?})",
+                    fragment.tasks.last().unwrap().id,
+                    parent
                 );
             }
         }
@@ -708,21 +746,36 @@ fn main() -> Result<()> {
             println!("Moved task {} to milestone {}", task_id, milestone);
         }
         Commands::Delete { task_id } => {
-            let path = storage.find_task_path(&task_id)?;
+            let project = storage.load_project()?;
+            
+            // Check backlog
+            let mut found = false;
+            let mut fragment = storage.load_fragment(&project.backlog_path)?;
+            if let Some(pos) = fragment.tasks.iter().position(|t| t.id == task_id) {
+                fragment.tasks.remove(pos);
+                storage.save_fragment(&project.backlog_path, &fragment)?;
+                found = true;
+            }
 
+            if !found {
+                for ms in &project.milestones {
+                    let mut fragment = storage.load_fragment(&ms.path)?;
+                    if let Some(pos) = fragment.tasks.iter().position(|t| t.id == task_id) {
+                        fragment.tasks.remove(pos);
+                        storage.save_fragment(&ms.path, &fragment)?;
+                        found = true;
+                        break;
+                    }
+                }
+            }
 
-            let mut fragment = storage.load_fragment(&path)?;
-            let task_index = fragment
-                .tasks
-                .iter()
-                .position(|t| t.id == task_id)
-                .unwrap();
-            fragment.tasks.remove(task_index);
-
-            storage.save_fragment(&path, &fragment)?;
-            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
-
-            println!("Deleted task {}", task_id);
+            if found {
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Deleted task {}", task_id);
+            } else {
+                println!("Task {} not found", task_id);
+            }
         }
         Commands::Edit { task_id } => {
             let path = storage.find_task_path(&task_id)?;

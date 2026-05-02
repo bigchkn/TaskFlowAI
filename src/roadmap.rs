@@ -1,3 +1,4 @@
+use crate::model::Status;
 use crate::storage::Storage;
 use anyhow::Result;
 use std::fs;
@@ -5,6 +6,8 @@ use std::path::Path;
 
 pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result<()> {
     let project = storage.load_project()?;
+    let all_tasks = storage.load_all_tasks()?;
+    let uid_to_id: std::collections::HashMap<_, _> = all_tasks.iter().map(|t| (t.uid, t.id.clone())).collect();
 
     // 1. Generate ROADMAP_ACTIVE.md
     let mut active_md = format!("# Project Roadmap: {}\n\n", project.name);
@@ -31,13 +34,21 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
 
             let fragment = storage.load_fragment(&ms.path)?;
             for task in &fragment.tasks {
-                let check = if task.status == crate::model::Status::Done { "x" } else { " " };
+                let check = if task.status == Status::Done { "x" } else { " " };
+                let indent = if task.parent_id.is_some() { "  " } else { "" };
+                let parent_info = if let Some(p_uid) = task.parent_id {
+                    let p_id = uid_to_id.get(&p_uid).map(|s| s.as_str()).unwrap_or("Unknown");
+                    format!(" (Parent: {})", p_id)
+                } else {
+                    "".to_string()
+                };
+
                 active_md.push_str(&format!(
-                    "- [{}] **{}**: {} (`{:?}`)\n",
-                    check, task.id, task.title, task.status
+                    "{}- [{}] **{}**: {}{}(`{:?}`)\n",
+                    indent, check, task.id, task.title, parent_info, task.status
                 ));
                 for design in &task.designs {
-                    active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                    active_md.push_str(&format!("{}  - [{:?}] {} (`{:?}`)\n", indent, design.design_type, design.path, design.status));
                 }
             }
             active_md.push_str("\n");
@@ -50,13 +61,21 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
         active_md.push_str("_Backlog is empty._\n\n");
     } else {
         for task in &backlog.tasks {
-            let check = if task.status == crate::model::Status::Done { "x" } else { " " };
+            let check = if task.status == Status::Done { "x" } else { " " };
+            let indent = if task.parent_id.is_some() { "  " } else { "" };
+            let parent_info = if let Some(p_uid) = task.parent_id {
+                let p_id = uid_to_id.get(&p_uid).map(|s| s.as_str()).unwrap_or("Unknown");
+                format!(" (Parent: {})", p_id)
+            } else {
+                "".to_string()
+            };
+
             active_md.push_str(&format!(
-                "- [{}] **{}**: {} (`{:?}`)\n",
-                check, task.id, task.title, task.status
+                "{}- [{}] **{}**: {}{}(`{:?}`)\n",
+                indent, check, task.id, task.title, parent_info, task.status
             ));
             for design in &task.designs {
-                active_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                active_md.push_str(&format!("{}  - [{:?}] {} (`{:?}`)\n", indent, design.design_type, design.path, design.status));
             }
         }
     }
@@ -84,14 +103,24 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
 
             let fragment = storage.load_fragment(&ms.path)?;
             for task in &fragment.tasks {
+                let check = if task.status == Status::Done { "x" } else { " " };
+                let indent = if task.parent_id.is_some() { "  " } else { "" };
+                let parent_info = if let Some(p_uid) = task.parent_id {
+                    let p_id = uid_to_id.get(&p_uid).map(|s| s.as_str()).unwrap_or("Unknown");
+                    format!(" (Parent: {})", p_id)
+                } else {
+                    "".to_string()
+                };
+
                 archive_md.push_str(&format!(
-                    "- [x] **{}**: {} (`{:?}`)\n",
-                    task.id, task.title, task.status
+                    "{}- [{}] **{}**: {}{}(`{:?}`)\n",
+                    indent, check, task.id, task.title, parent_info, task.status
                 ));
                 for design in &task.designs {
-                    archive_md.push_str(&format!("  - [{:?}] {} (`{:?}`)\n", design.design_type, design.path, design.status));
+                    archive_md.push_str(&format!("{}  - [{:?}] {} (`{:?}`)\n", indent, design.design_type, design.path, design.status));
                 }
             }
+
             archive_md.push_str("\n");
         }
     }

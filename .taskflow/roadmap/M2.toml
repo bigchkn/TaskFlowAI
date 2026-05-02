@@ -141,30 +141,3 @@ logs = []
 
 [tasks.metadata]
 priority = "10"
-
-[[tasks]]
-id = "TF-14"
-uid = "857d6ceb-7efb-41bf-999a-ad7c95d53aea"
-title = "Implement delete command"
-description = ""
-task_type = "feature"
-status = "done"
-priority = 0
-subtask_uids = []
-milestone_id = "M2"
-tags = []
-created_at = "2026-05-02T18:59:28.113263Z"
-updated_at = "2026-05-02T18:59:53.961056Z"
-completed_at = "2026-05-02T18:59:53.961057Z"
-
-[[tasks.designs]]
-design_type = "lld"
-path = "docs/designs/M2/TF-14/lld-delete-command-implementation.md"
-status = "draft"
-created_at = "2026-05-02T18:59:28.118400Z"
-updated_at = "2026-05-02T18:59:28.118400Z"
-
-[tasks.execution]
-logs = []
-
-[tasks.metadata]
