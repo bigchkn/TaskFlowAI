@@ -1,13 +1,13 @@
 mod model;
-mod storage;
 mod roadmap;
+mod storage;
 mod validation;
 
-use clap::{Parser, Subcommand};
-use crate::model::{Task, TaskType, Status, Project, MilestoneMetadata, TaskFragment};
+use crate::model::{MilestoneMetadata, Project, Status, Task, TaskFragment, TaskType};
 use crate::storage::{FileStorage, Storage};
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use chrono::Utc;
+use clap::{Parser, Subcommand};
 
 // ... (Cli and Commands enums)
 
@@ -45,10 +45,7 @@ enum Commands {
         command: MilestoneCommands,
     },
     /// Update task status
-    Status {
-        task_id: String,
-        new_status: String,
-    },
+    Status { task_id: String, new_status: String },
     /// Execution tracking
     Execute {
         #[command(subcommand)]
@@ -60,13 +57,9 @@ enum Commands {
         command: MetaCommands,
     },
     /// Validate a task against its template requirements
-    Validate {
-        task_id: String,
-    },
+    Validate { task_id: String },
     /// Archive a completed milestone
-    Archive {
-        milestone_id: String,
-    },
+    Archive { milestone_id: String },
     /// Sync and regenerate Markdown roadmap files
     Sync,
     /// Show project dashboard
@@ -127,7 +120,7 @@ fn parse_status(s: &str) -> Result<Status> {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    
+
     let storage_root = std::env::current_dir()?.join(".taskflow");
     let storage = FileStorage::new(storage_root.clone());
 
@@ -147,7 +140,11 @@ fn main() -> Result<()> {
             roadmap::generate_roadmaps(&storage, &project_root)?;
             println!("Initialized taskflow project");
         }
-        Commands::Add { title, task_type, milestone } => {
+        Commands::Add {
+            title,
+            task_type,
+            milestone,
+        } => {
             let project = storage.load_project()?;
             let t_type = match task_type.as_deref() {
                 Some("bug") => TaskType::Bug,
@@ -155,52 +152,72 @@ fn main() -> Result<()> {
                 Some("research") => TaskType::Research,
                 _ => TaskType::Feature,
             };
-            
+
             let all_tasks = storage.load_all_tasks()?;
             let next_id = format!("TF-{}", all_tasks.len() + 1);
             let mut task = Task::new(next_id, title, t_type);
-            
+
             if let Some(ms_id) = milestone {
-                let ms_meta = project.milestones.iter()
+                let ms_meta = project
+                    .milestones
+                    .iter()
                     .find(|m| m.id == ms_id)
                     .with_context(|| format!("Milestone {} not found", ms_id))?;
-                
+
                 task.milestone_id = Some(ms_id.clone());
                 let mut fragment = storage.load_fragment(&ms_meta.path)?;
                 fragment.tasks.push(task);
                 storage.save_fragment(&ms_meta.path, &fragment)?;
                 let project_root = std::env::current_dir()?;
                 roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Added task {} to milestone {}", fragment.tasks.last().unwrap().id, ms_id);
+                println!(
+                    "Added task {} to milestone {}",
+                    fragment.tasks.last().unwrap().id,
+                    ms_id
+                );
             } else {
                 let mut fragment = storage.load_fragment(&project.backlog_path)?;
                 fragment.tasks.push(task);
                 storage.save_fragment(&project.backlog_path, &fragment)?;
                 let project_root = std::env::current_dir()?;
                 roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Added task {} to backlog", fragment.tasks.last().unwrap().id);
+                println!(
+                    "Added task {} to backlog",
+                    fragment.tasks.last().unwrap().id
+                );
             }
         }
         Commands::List { milestone } => {
             let project = storage.load_project()?;
             if let Some(ms_id) = milestone {
-                let ms_meta = project.milestones.iter()
+                let ms_meta = project
+                    .milestones
+                    .iter()
                     .find(|m| m.id == ms_id)
                     .with_context(|| format!("Milestone {} not found", ms_id))?;
                 let fragment = storage.load_fragment(&ms_meta.path)?;
                 println!("Milestone: {} ({})", ms_meta.name, ms_meta.id);
                 for task in &fragment.tasks {
-                    println!("[{}] {} ({:?}) - {:?}", task.id, task.title, task.status, task.task_type);
+                    println!(
+                        "[{}] {} ({:?}) - {:?}",
+                        task.id, task.title, task.status, task.task_type
+                    );
                 }
             } else {
                 let all_tasks = storage.load_all_tasks()?;
                 for task in all_tasks {
                     let ms_info = task.milestone_id.as_deref().unwrap_or("Backlog");
-                    println!("[{}] [{}] {} ({:?}) - {:?}", task.id, ms_info, task.title, task.status, task.task_type);
+                    println!(
+                        "[{}] [{}] {} ({:?}) - {:?}",
+                        task.id, ms_info, task.title, task.status, task.task_type
+                    );
                 }
             }
         }
-        Commands::Status { task_id, new_status } => {
+        Commands::Status {
+            task_id,
+            new_status,
+        } => {
             let status = parse_status(&new_status)?;
             storage.update_task(&task_id, |task| {
                 task.status = status;
@@ -220,28 +237,37 @@ fn main() -> Result<()> {
         }
         Commands::Archive { milestone_id } => {
             let mut project = storage.load_project()?;
-            let index = project.milestones.iter().position(|m| m.id == milestone_id)
-                .with_context(|| format!("Milestone {} not found in active milestones", milestone_id))?;
-            
+            let index = project
+                .milestones
+                .iter()
+                .position(|m| m.id == milestone_id)
+                .with_context(|| {
+                    format!("Milestone {} not found in active milestones", milestone_id)
+                })?;
+
             let mut ms_meta = project.milestones.remove(index);
-            
+
             // New path in archive/
             let old_path = ms_meta.path.clone();
             let new_path = format!("archive/{}.toml", milestone_id);
-            
+
             // Move the file
             let old_full_path = storage_root.join(&old_path);
             let new_full_path = storage_root.join(&new_path);
-            
+
             if let Some(parent) = new_full_path.parent() {
                 std::fs::create_dir_all(parent)?;
             }
-            std::fs::rename(&old_full_path, &new_full_path)
-                .with_context(|| format!("Failed to move milestone file from {:?} to {:?}", old_full_path, new_full_path))?;
-            
+            std::fs::rename(&old_full_path, &new_full_path).with_context(|| {
+                format!(
+                    "Failed to move milestone file from {:?} to {:?}",
+                    old_full_path, new_full_path
+                )
+            })?;
+
             ms_meta.path = new_path;
             project.archived_milestones.push(ms_meta);
-            
+
             storage.save_project(&project)?;
             let project_root = std::env::current_dir()?;
             roadmap::generate_roadmaps(&storage, &project_root)?;
@@ -256,93 +282,102 @@ fn main() -> Result<()> {
             let project = storage.load_project()?;
             let active_tasks = storage.load_active_tasks()?;
             let all_tasks = storage.load_all_tasks()?;
-            
+
             println!("Dashboard: {}", project.name);
             println!("Active Milestones: {}", project.milestones.len());
             println!("Archived Milestones: {}", project.archived_milestones.len());
             println!("---");
             println!("Active Tasks: {}", active_tasks.len());
-            let active_done = active_tasks.iter().filter(|t| t.status == Status::Done).count();
-            println!("Active Progress: {}/{} completed", active_done, active_tasks.len());
+            let active_done = active_tasks
+                .iter()
+                .filter(|t| t.status == Status::Done)
+                .count();
+            println!(
+                "Active Progress: {}/{} completed",
+                active_done,
+                active_tasks.len()
+            );
             println!("---");
             println!("Total Project Tasks: {}", all_tasks.len());
         }
-        Commands::Milestone { command } => {
-            match command {
-                MilestoneCommands::Create { id, name } => {
-                    let mut project = storage.load_project()?;
-                    if project.milestones.iter().any(|m| m.id == id) {
-                        return Err(anyhow::anyhow!("Milestone {} already exists", id));
+        Commands::Milestone { command } => match command {
+            MilestoneCommands::Create { id, name } => {
+                let mut project = storage.load_project()?;
+                if project.milestones.iter().any(|m| m.id == id) {
+                    return Err(anyhow::anyhow!("Milestone {} already exists", id));
+                }
+                let path = format!("roadmap/{}.toml", id);
+                project.milestones.push(MilestoneMetadata {
+                    id: id.clone(),
+                    name,
+                    description: String::new(),
+                    target_date: None,
+                    status: Status::Todo,
+                    path: path.clone(),
+                });
+                storage.save_project(&project)?;
+                storage.save_fragment(&path, &TaskFragment::default())?;
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Created milestone {}", id);
+            }
+            MilestoneCommands::List => {
+                let project = storage.load_project()?;
+                for ms in &project.milestones {
+                    println!("{} - {} ({})", ms.id, ms.name, ms.path);
+                }
+            }
+        },
+        Commands::Execute { command } => match command {
+            ExecuteCommands::Start { task_id, agent } => {
+                storage.update_task(&task_id, |task| {
+                    task.status = Status::InProgress;
+                    task.execution.agent_id = agent;
+                    task.execution.start_time = Some(Utc::now());
+                    task.updated_at = Utc::now();
+                    Ok(())
+                })?;
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Started execution for task {}", task_id);
+            }
+            ExecuteCommands::Complete {
+                task_id,
+                outcome,
+                log,
+            } => {
+                storage.update_task(&task_id, |task| {
+                    task.status = Status::Done;
+                    task.execution.end_time = Some(Utc::now());
+                    task.execution.outcome = outcome;
+                    if let Some(l) = log {
+                        task.execution.logs.push(l);
                     }
-                    let path = format!("roadmap/{}.toml", id);
-                    project.milestones.push(MilestoneMetadata {
-                        id: id.clone(),
-                        name,
-                        description: String::new(),
-                        target_date: None,
-                        status: Status::Todo,
-                        path: path.clone(),
-                    });
-                    storage.save_project(&project)?;
-                    storage.save_fragment(&path, &TaskFragment::default())?;
-                    let project_root = std::env::current_dir()?;
-                    roadmap::generate_roadmaps(&storage, &project_root)?;
-                    println!("Created milestone {}", id);
-                }
-                MilestoneCommands::List => {
-                    let project = storage.load_project()?;
-                    for ms in &project.milestones {
-                        println!("{} - {} ({})", ms.id, ms.name, ms.path);
-                    }
-                }
+                    task.completed_at = Some(Utc::now());
+                    task.updated_at = Utc::now();
+                    Ok(())
+                })?;
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Completed execution for task {}", task_id);
             }
-        }
-        Commands::Execute { command } => {
-            match command {
-                ExecuteCommands::Start { task_id, agent } => {
-                    storage.update_task(&task_id, |task| {
-                        task.status = Status::InProgress;
-                        task.execution.agent_id = agent;
-                        task.execution.start_time = Some(Utc::now());
-                        task.updated_at = Utc::now();
-                        Ok(())
-                    })?;
-                    let project_root = std::env::current_dir()?;
-                    roadmap::generate_roadmaps(&storage, &project_root)?;
-                    println!("Started execution for task {}", task_id);
-                }
-                ExecuteCommands::Complete { task_id, outcome, log } => {
-                    storage.update_task(&task_id, |task| {
-                        task.status = Status::Done;
-                        task.execution.end_time = Some(Utc::now());
-                        task.execution.outcome = outcome;
-                        if let Some(l) = log {
-                            task.execution.logs.push(l);
-                        }
-                        task.completed_at = Some(Utc::now());
-                        task.updated_at = Utc::now();
-                        Ok(())
-                    })?;
-                    let project_root = std::env::current_dir()?;
-                    roadmap::generate_roadmaps(&storage, &project_root)?;
-                    println!("Completed execution for task {}", task_id);
-                }
+        },
+        Commands::Meta { command } => match command {
+            MetaCommands::Set {
+                task_id,
+                key,
+                value,
+            } => {
+                storage.update_task(&task_id, |task| {
+                    task.metadata.insert(key, value);
+                    task.updated_at = Utc::now();
+                    Ok(())
+                })?;
+                let project_root = std::env::current_dir()?;
+                roadmap::generate_roadmaps(&storage, &project_root)?;
+                println!("Set metadata for task {}", task_id);
             }
-        }
-        Commands::Meta { command } => {
-            match command {
-                MetaCommands::Set { task_id, key, value } => {
-                    storage.update_task(&task_id, |task| {
-                        task.metadata.insert(key, value);
-                        task.updated_at = Utc::now();
-                        Ok(())
-                    })?;
-                    let project_root = std::env::current_dir()?;
-                    roadmap::generate_roadmaps(&storage, &project_root)?;
-                    println!("Set metadata for task {}", task_id);
-                }
-            }
-        }
+        },
     }
 
     Ok(())

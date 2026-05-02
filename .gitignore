@@ -25,3 +25,5 @@ target
 
 /target
 .temp/
+.taskflow/roadmap/
+.taskflow/archive/
