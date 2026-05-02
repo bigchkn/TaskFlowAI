@@ -2,52 +2,11 @@ mod model;
 mod roadmap;
 mod storage;
 mod validation;
+mod commands;
 
-use crate::model::{
-    Design, DesignStatus, DesignType, MilestoneMetadata, Project, Status, Task, TaskFragment,
-    TaskType,
-};
-use crate::storage::{FileStorage, Storage};
-use anyhow::{Context, Result};
-use chrono::Utc;
+use crate::storage::FileStorage;
+use anyhow::Result;
 use clap::{Parser, Subcommand};
-use std::env;
-use std::fs;
-use std::path::PathBuf;
-use std::process::Command;
-
-const TASKFLOW_SKILL_PROMPT: &str = r#"
-# TaskFlowAI Agent Skill
-
-You are an AI agent operating within a TaskFlowAI managed project. Your goal is to manage tasks and designs while maintaining the strict decoupling of machine-readable metadata and human-readable documentation.
-
-## Core Principles
-1. **Metadata vs. Documentation**: Task state (status, priority, execution logs) lives in TOML fragments in `.taskflow/roadmap/`. Narrative documentation (HLDs, LLDs) lives in `docs/designs/`.
-2. **Git-Native**: All state changes must be committed to Git.
-3. **Automated Roadmaps**: `ROADMAP_ACTIVE.md` is automatically generated from the TOML fragments. Never edit it manually.
-
-## Standard Workflow
-1. **Discover**: Run `taskflow-ai next` to find the highest priority task and its associated designs.
-2. **Research & Design**:
-   - Read the linked HLD/LLDs.
-   - If a new design is needed, run `taskflow-ai design init <hld|lld> <Title> --milestone <M_ID> [--task <TF_ID>]`.
-   - Populate the scaffolded Markdown file.
-3. **Execute**:
-   - Start: `taskflow-ai execute start <TF_ID> --agent <Agent_Name>`.
-   - Implement the change.
-   - Validate: `taskflow-ai validate <TF_ID>`.
-   - Complete: `taskflow-ai execute complete <TF_ID> --outcome success --log "Summary of work"`.
-4. **Sync**: The roadmap usually syncs automatically, but you can run `taskflow-ai sync` to be sure.
-
-## Directory Structure
-- `.taskflow/roadmap/index.toml`: Project metadata and milestone index.
-- `.taskflow/roadmap/M*.toml`: Milestone fragments containing tasks.
-- `.taskflow/templates/designs/`: Markdown templates for HLD/LLD.
-- `docs/designs/`: Human-readable design documents.
-- `ROADMAP_ACTIVE.md`: The generated project view.
-"#;
-
-// ... (Cli and Commands enums)
 
 #[derive(Parser)]
 #[command(name = "taskflow-ai")]
@@ -193,38 +152,6 @@ enum MetaCommands {
     },
 }
 
-fn parse_design_type(s: &str) -> Result<DesignType> {
-    match s.to_lowercase().as_str() {
-        "hld" => Ok(DesignType::Hld),
-        "lld" => Ok(DesignType::Lld),
-        "rfc" => Ok(DesignType::Rfc),
-        _ => Err(anyhow::anyhow!("Unknown design type: {}", s)),
-    }
-}
-
-fn parse_design_status(s: &str) -> Result<DesignStatus> {
-    match s.to_lowercase().as_str() {
-        "draft" => Ok(DesignStatus::Draft),
-        "review" => Ok(DesignStatus::Review),
-        "approved" => Ok(DesignStatus::Approved),
-        "deprecated" => Ok(DesignStatus::Deprecated),
-        _ => Err(anyhow::anyhow!("Unknown design status: {}", s)),
-    }
-}
-
-fn parse_status(s: &str) -> Result<Status> {
-    match s.to_lowercase().as_str() {
-        "backlog" => Ok(Status::Backlog),
-        "todo" => Ok(Status::Todo),
-        "inprogress" | "in-progress" => Ok(Status::InProgress),
-        "review" => Ok(Status::Review),
-        "done" => Ok(Status::Done),
-        "blocked" => Ok(Status::Blocked),
-        "canceled" | "cancelled" => Ok(Status::Canceled),
-        _ => Err(anyhow::anyhow!("Unknown status: {}", s)),
-    }
-}
-
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
@@ -232,291 +159,39 @@ fn main() -> Result<()> {
     let storage = FileStorage::new(storage_root.clone());
 
     match cli.command {
-        Commands::Init { name } => {
-            let project = Project {
-                name,
-                description: String::new(),
-                version: "0.1.0".to_string(),
-                milestones: Vec::new(),
-                archived_milestones: Vec::new(),
-                backlog_path: "roadmap/backlog.toml".to_string(),
-            };
-            storage.save_project(&project)?;
-            storage.save_fragment(&project.backlog_path, &TaskFragment::default())?;
-            let project_root = std::env::current_dir()?;
-            roadmap::generate_roadmaps(&storage, &project_root)?;
-            println!("Initialized taskflow project");
-        }
+        Commands::Init { name } => commands::init(&storage, name),
         Commands::Add {
             title,
             task_type,
             milestone,
             parent,
-        } => {
-            let project = storage.load_project()?;
-            let t_type = match task_type.as_deref() {
-                Some("bug") => TaskType::Bug,
-                Some("chore") => TaskType::Chore,
-                Some("research") => TaskType::Research,
-                _ => TaskType::Feature,
-            };
-
-            let all_tasks = storage.load_all_tasks()?;
-            let max_id = all_tasks
-                .iter()
-                .filter_map(|t| t.id.strip_prefix("TF-")?.parse::<usize>().ok())
-                .max()
-                .unwrap_or(0);
-            let next_id = format!("TF-{}", max_id + 1);
-            let mut task = Task::new(next_id, title, t_type);
-
-            // Handle parent linkage
-            let parent_ms_id = if let Some(ref parent_id) = parent {
-                // Try to inherit milestone from parent
-                let parent_path = storage.find_task_path(parent_id)?;
-                let parent_fragment = storage.load_fragment(&parent_path)?;
-                let parent_task = parent_fragment
-                    .tasks
-                    .iter()
-                    .find(|t| t.id == *parent_id)
-                    .unwrap();
-                
-                task.parent_id = Some(parent_task.uid);
-
-                // Update parent's subtask list
-                let child_uid = task.uid;
-                storage.update_task(parent_id, |p| {
-                    p.subtask_uids.push(child_uid);
-                    Ok(())
-                })?;
-
-                parent_task.milestone_id.clone()
-            } else {
-                None
-            };
-
-            // Use explicitly provided milestone or inherited one
-            let final_ms_id = milestone.or(parent_ms_id);
-
-            if let Some(ms_id) = final_ms_id {
-                let ms_meta = project
-                    .milestones
-                    .iter()
-                    .find(|m| m.id == ms_id)
-                    .with_context(|| format!("Milestone {} not found", ms_id))?;
-
-                task.milestone_id = Some(ms_id.clone());
-                let mut fragment = storage.load_fragment(&ms_meta.path)?;
-                fragment.tasks.push(task);
-                storage.save_fragment(&ms_meta.path, &fragment)?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!(
-                    "Added task {} to milestone {} (Parent: {:?})",
-                    fragment.tasks.last().unwrap().id,
-                    ms_id,
-                    parent
-                );
-            } else {
-                let mut fragment = storage.load_fragment(&project.backlog_path)?;
-                fragment.tasks.push(task);
-                storage.save_fragment(&project.backlog_path, &fragment)?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!(
-                    "Added task {} to backlog (Parent: {:?})",
-                    fragment.tasks.last().unwrap().id,
-                    parent
-                );
-            }
-        }
-        Commands::List { milestone } => {
-            let project = storage.load_project()?;
-            if let Some(ms_id) = milestone {
-                let ms_meta = project
-                    .milestones
-                    .iter()
-                    .find(|m| m.id == ms_id)
-                    .with_context(|| format!("Milestone {} not found", ms_id))?;
-                let fragment = storage.load_fragment(&ms_meta.path)?;
-                println!("Milestone: {} ({})", ms_meta.name, ms_meta.id);
-                for task in &fragment.tasks {
-                    println!(
-                        "[{}] {} ({:?}) - {:?}",
-                        task.id, task.title, task.status, task.task_type
-                    );
-                }
-            } else {
-                let all_tasks = storage.load_all_tasks()?;
-                for task in all_tasks {
-                    let ms_info = task.milestone_id.as_deref().unwrap_or("Backlog");
-                    println!(
-                        "[{}] [{}] {} ({:?}) - {:?}",
-                        task.id, ms_info, task.title, task.status, task.task_type
-                    );
-                }
-            }
-        }
+        } => commands::add(&storage, title, task_type, milestone, parent),
+        Commands::List { milestone } => commands::list(&storage, milestone),
         Commands::Status {
             task_id,
             new_status,
-        } => {
-            let status = parse_status(&new_status)?;
-            storage.update_task(&task_id, |task| {
-                task.status = status;
-                task.updated_at = Utc::now();
-                if status == Status::Done {
-                    task.completed_at = Some(Utc::now());
-                }
-                Ok(())
-            })?;
-            let project_root = std::env::current_dir()?;
-            roadmap::generate_roadmaps(&storage, &project_root)?;
-            println!("Updated task {} status to {:?}", task_id, status);
-        }
-        Commands::Archive { milestone_id } => {
-            let mut project = storage.load_project()?;
-            let index = project
-                .milestones
-                .iter()
-                .position(|m| m.id == milestone_id)
-                .with_context(|| {
-                    format!("Milestone {} not found in active milestones", milestone_id)
-                })?;
-
-            let mut ms_meta = project.milestones.remove(index);
-
-            // New path in archive/
-            let old_path = ms_meta.path.clone();
-            let new_path = format!("archive/{}.toml", milestone_id);
-
-            // Move the file
-            let old_full_path = storage_root.join(&old_path);
-            let new_full_path = storage_root.join(&new_path);
-
-            if let Some(parent) = new_full_path.parent() {
-                std::fs::create_dir_all(parent)?;
-            }
-            std::fs::rename(&old_full_path, &new_full_path).with_context(|| {
-                format!(
-                    "Failed to move milestone file from {:?} to {:?}",
-                    old_full_path, new_full_path
-                )
-            })?;
-
-            ms_meta.path = new_path;
-            project.archived_milestones.push(ms_meta);
-
-            storage.save_project(&project)?;
-            let project_root = std::env::current_dir()?;
-            roadmap::generate_roadmaps(&storage, &project_root)?;
-            println!("Archived milestone {}", milestone_id);
-        }
-        Commands::Sync => {
-            let project_root = std::env::current_dir()?;
-            roadmap::generate_roadmaps(&storage, &project_root)?;
-            println!("Roadmap files synced");
-        }
-        Commands::Dashboard => {
-            let project = storage.load_project()?;
-            let active_tasks = storage.load_active_tasks()?;
-            let all_tasks = storage.load_all_tasks()?;
-
-            println!("Dashboard: {}", project.name);
-            println!("Active Milestones: {}", project.milestones.len());
-            println!("Archived Milestones: {}", project.archived_milestones.len());
-            println!("---");
-            println!("Active Tasks: {}", active_tasks.len());
-            let active_done = active_tasks
-                .iter()
-                .filter(|t| t.status == Status::Done)
-                .count();
-            println!(
-                "Active Progress: {}/{} completed",
-                active_done,
-                active_tasks.len()
-            );
-            println!("---");
-            println!("Total Project Tasks: {}", all_tasks.len());
-        }
+        } => commands::status(&storage, task_id, new_status),
+        Commands::Archive { milestone_id } => commands::archive(&storage, &storage_root, milestone_id),
+        Commands::Sync => commands::sync(&storage),
+        Commands::Dashboard => commands::dashboard(&storage),
         Commands::Milestone { command } => match command {
-            MilestoneCommands::Create { id, name } => {
-                let mut project = storage.load_project()?;
-                if project.milestones.iter().any(|m| m.id == id) {
-                    return Err(anyhow::anyhow!("Milestone {} already exists", id));
-                }
-                let path = format!("roadmap/{}.toml", id);
-                project.milestones.push(MilestoneMetadata {
-                    id: id.clone(),
-                    name,
-                    description: String::new(),
-                    target_date: None,
-                    status: Status::Todo,
-                    path: path.clone(),
-                    designs: Vec::new(),
-                });
-                storage.save_project(&project)?;
-                storage.save_fragment(&path, &TaskFragment::default())?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Created milestone {}", id);
-            }
-            MilestoneCommands::List => {
-                let project = storage.load_project()?;
-                for ms in &project.milestones {
-                    println!("{} - {} ({})", ms.id, ms.name, ms.path);
-                }
-            }
+            MilestoneCommands::Create { id, name } => commands::milestone_create(&storage, id, name),
+            MilestoneCommands::List => commands::milestone_list(&storage),
         },
         Commands::Execute { command } => match command {
-            ExecuteCommands::Start { task_id, agent } => {
-                storage.update_task(&task_id, |task| {
-                    task.status = Status::InProgress;
-                    task.execution.agent_id = agent;
-                    task.execution.start_time = Some(Utc::now());
-                    task.updated_at = Utc::now();
-                    Ok(())
-                })?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Started execution for task {}", task_id);
-            }
+            ExecuteCommands::Start { task_id, agent } => commands::execute_start(&storage, task_id, agent),
             ExecuteCommands::Complete {
                 task_id,
                 outcome,
                 log,
-            } => {
-                storage.update_task(&task_id, |task| {
-                    task.status = Status::Done;
-                    task.execution.end_time = Some(Utc::now());
-                    task.execution.outcome = outcome;
-                    if let Some(l) = log {
-                        task.execution.logs.push(l);
-                    }
-                    task.completed_at = Some(Utc::now());
-                    task.updated_at = Utc::now();
-                    Ok(())
-                })?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Completed execution for task {}", task_id);
-            }
+            } => commands::execute_complete(&storage, task_id, outcome, log),
         },
         Commands::Meta { command } => match command {
             MetaCommands::Set {
                 task_id,
                 key,
                 value,
-            } => {
-                storage.update_task(&task_id, |task| {
-                    task.metadata.insert(key, value);
-                    task.updated_at = Utc::now();
-                    Ok(())
-                })?;
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Set metadata for task {}", task_id);
-            }
+            } => commands::meta_set(&storage, task_id, key, value),
         },
         Commands::Design { command } => match command {
             DesignCommands::Init {
@@ -524,311 +199,22 @@ fn main() -> Result<()> {
                 title,
                 milestone,
                 task,
-            } => {
-                let d_type = parse_design_type(&design_type)?;
-                let now = Utc::now();
-                let project_root = std::env::current_dir()?;
-
-                // Determine path: docs/designs/<milestone>[/<task>]/<type>-<title>.md
-                let mut relative_path = PathBuf::from("docs/designs");
-                relative_path.push(&milestone);
-                if let Some(ref t_id) = task {
-                    relative_path.push(t_id);
-                }
-                let filename = format!("{}-{}.md", design_type.to_lowercase(), title.to_lowercase().replace(" ", "-"));
-                relative_path.push(filename);
-                
-                let full_path = project_root.join(&relative_path);
-                if !full_path.exists() {
-                    if let Some(parent) = full_path.parent() {
-                        std::fs::create_dir_all(parent)?;
-                    }
-                    // Try to load template
-                    let template_path = project_root.join(format!(".taskflow/templates/designs/{}.md", design_type.to_lowercase()));
-                    let mut content = if template_path.exists() {
-                        std::fs::read_to_string(template_path)?
-                    } else {
-                        format!("# Design: {}\n\nType: {}\n", title, design_type)
-                    };
-                    content = content.replace("{TITLE}", &title);
-                    std::fs::write(&full_path, content)?;
-                    println!("Scaffolded design document at {:?}", relative_path);
-                }
-
-                let design = Design {
-                    design_type: d_type,
-                    path: relative_path.to_string_lossy().to_string(),
-                    status: DesignStatus::Draft,
-                    created_at: now,
-                    updated_at: now,
-                };
-
-                if let Some(ref t_id) = task {
-                    storage.update_task(t_id, |t| {
-                        t.designs.push(design);
-                        t.updated_at = now;
-                        Ok(())
-                    })?;
-                } else {
-                    storage.update_milestone(&milestone, |m| {
-                        m.designs.push(design);
-                        Ok(())
-                    })?;
-                }
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Registered design for {} {}", if task.is_some() { "task" } else { "milestone" }, if let Some(ref t_id) = task { t_id } else { &milestone });
-            }
+            } => commands::design_init(&storage, design_type, title, milestone, task),
             DesignCommands::Status {
                 path,
                 status,
                 milestone,
                 task,
-            } => {
-                let d_status = parse_design_status(&status)?;
-                let now = Utc::now();
-                if let Some(t_id) = task {
-                    storage.update_task(&t_id, |t| {
-                        if let Some(d) = t.designs.iter_mut().find(|d| d.path == path) {
-                            d.status = d_status;
-                            d.updated_at = now;
-                            t.updated_at = now;
-                            Ok(())
-                        } else {
-                            Err(anyhow::anyhow!("Design not found at path {} in task {}", path, t_id))
-                        }
-                    })?;
-                } else {
-                    storage.update_milestone(&milestone, |m| {
-                        if let Some(d) = m.designs.iter_mut().find(|d| d.path == path) {
-                            d.status = d_status;
-                            d.updated_at = now;
-                            Ok(())
-                        } else {
-                            Err(anyhow::anyhow!("Design not found at path {} in milestone {}", path, milestone))
-                        }
-                    })?;
-                }
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Updated design status to {:?}", d_status);
-            }
+            } => commands::design_set_status(&storage, path, status, milestone, task),
         },
-        Commands::Validate { task_id } => {
-            let project_root = std::env::current_dir()?;
-            // Check if it's a milestone or task. For now, let's try task first, then milestone.
-            if let Err(_) = validation::validate_task(&storage, &project_root, &task_id) {
-                 validation::validate_milestone(&storage, &project_root, &task_id)?;
-            }
-        }
-        Commands::Next => {
-            let project = storage.load_project()?;
-            let mut next_task: Option<(Task, String)> = None; // (Task, Milestone Name)
-
-            // 1. Check Milestones
-            for ms in &project.milestones {
-                let fragment = storage.load_fragment(&ms.path)?;
-
-                // Prioritize InProgress
-                if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::InProgress) {
-                    next_task = Some((task.clone(), ms.name.clone()));
-                    break;
-                }
-
-                // Then Todo
-                if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::Todo) {
-                    next_task = Some((task.clone(), ms.name.clone()));
-                    break;
-                }
-
-                // Then Backlog (if in a milestone)
-                if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::Backlog) {
-                    next_task = Some((task.clone(), ms.name.clone()));
-                    break;
-                }
-            }
-
-            // 2. Check Global Backlog
-            if next_task.is_none() {
-                let backlog = storage.load_fragment(&project.backlog_path)?;
-                if let Some(task) = backlog.tasks.iter().find(|t| t.status != Status::Done && t.status != Status::Canceled) {
-                    next_task = Some((task.clone(), "Global Backlog".to_string()));
-                }
-            }
-
-            if let Some((task, ms_name)) = next_task {
-                println!(">>> Next Task: {} - {}", task.id, task.title);
-                println!("Milestone: {}", ms_name);
-                println!("Status:    {:?}", task.status);
-                println!("Priority:  {}", task.priority);
-
-                if !task.designs.is_empty() {
-                    println!("\nDesigns:");
-                    for design in &task.designs {
-                        println!("  - [{:?}] {} (`{:?}`)", design.design_type, design.path, design.status);
-                    }
-                }
-
-                if !task.metadata.is_empty() {
-                    println!("\nMetadata:");
-                    for (k, v) in &task.metadata {
-                        println!("  {}: {}", k, v);
-                    }
-                }
-
-                println!("\nSuggested Action:");
-                match task.status {
-                    Status::Backlog | Status::Todo => {
-                        println!("  taskflow-ai execute start {}", task.id);
-                    }
-                    Status::InProgress => {
-                        println!("  taskflow-ai execute complete {}", task.id);
-                    }
-                    Status::Review => {
-                        println!("  taskflow-ai status {} done", task.id);
-                    }
-                    _ => {}
-                }
-            } else {
-                println!("No pending tasks found. Project complete or backlog empty!");
-            }
-        }
-        Commands::Skill => {
-            println!("{}", TASKFLOW_SKILL_PROMPT);
-        }
+        Commands::Validate { task_id } => commands::validate(&storage, task_id),
+        Commands::Next => commands::next(&storage),
+        Commands::Skill => commands::skill(),
         Commands::Move {
             task_id,
             milestone,
-        } => {
-            let project = storage.load_project()?;
-            let source_path = storage.find_task_path(&task_id)?;
-
-            let target_milestone = project
-                .milestones
-                .iter()
-                .find(|m| m.id == milestone || m.name == milestone)
-                .context(format!("Milestone {} not found", milestone))?;
-
-            let target_path = target_milestone.path.clone();
-
-            if source_path == target_path {
-                println!("Task {} is already in milestone {}", task_id, milestone);
-                return Ok(());
-            }
-
-            // Load fragments
-            let mut source_fragment = storage.load_fragment(&source_path)?;
-            let mut target_fragment = storage.load_fragment(&target_path)?;
-
-            // Extract task
-            let task_index = source_fragment
-                .tasks
-                .iter()
-                .position(|t| t.id == task_id)
-                .unwrap();
-            let mut task = source_fragment.tasks.remove(task_index);
-
-            // Update status if moving from backlog to milestone
-            if task.status == Status::Backlog {
-                task.status = Status::Todo;
-            }
-
-            // Add to target
-            target_fragment.tasks.push(task);
-
-            // Save
-            storage.save_fragment(&source_path, &source_fragment)?;
-            storage.save_fragment(&target_path, &target_fragment)?;
-
-            // Sync roadmap
-            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
-
-            println!("Moved task {} to milestone {}", task_id, milestone);
-        }
-        Commands::Delete { task_id } => {
-            let project = storage.load_project()?;
-            
-            // Check backlog
-            let mut found = false;
-            let mut fragment = storage.load_fragment(&project.backlog_path)?;
-            if let Some(pos) = fragment.tasks.iter().position(|t| t.id == task_id) {
-                fragment.tasks.remove(pos);
-                storage.save_fragment(&project.backlog_path, &fragment)?;
-                found = true;
-            }
-
-            if !found {
-                for ms in &project.milestones {
-                    let mut fragment = storage.load_fragment(&ms.path)?;
-                    if let Some(pos) = fragment.tasks.iter().position(|t| t.id == task_id) {
-                        fragment.tasks.remove(pos);
-                        storage.save_fragment(&ms.path, &fragment)?;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-
-            if found {
-                let project_root = std::env::current_dir()?;
-                roadmap::generate_roadmaps(&storage, &project_root)?;
-                println!("Deleted task {}", task_id);
-            } else {
-                println!("Task {} not found", task_id);
-            }
-        }
-        Commands::Edit { task_id } => {
-            let path = storage.find_task_path(&task_id)?;
-            let mut fragment = storage.load_fragment(&path)?;
-
-            let task_index = fragment
-                .tasks
-                .iter()
-                .position(|t| t.id == task_id)
-                .unwrap();
-            let task = &fragment.tasks[task_index];
-
-            // Create temporary file
-            let temp_path = env::temp_dir().join(format!("{}.toml", task_id));
-            let task_toml = toml::to_string_pretty(task)?;
-            fs::write(&temp_path, task_toml)?;
-
-            // Open editor
-            let editor = env::var("EDITOR")
-                .or_else(|_| env::var("VISUAL"))
-                .unwrap_or_else(|_| "vi".to_string());
-
-            let status = Command::new(&editor).arg(&temp_path).status()?;
-
-            if !status.success() {
-                return Err(anyhow::anyhow!("Editor exited with failure"));
-            }
-
-            // Read back and parse
-            let edited_toml = fs::read_to_string(&temp_path)?;
-            let updated_task: Task = toml::from_str(&edited_toml)?;
-
-            if updated_task.id != task_id {
-                return Err(anyhow::anyhow!(
-                    "Task ID change is not allowed during edit ({} -> {})",
-                    task_id,
-                    updated_task.id
-                ));
-            }
-
-            // Update in fragment
-            fragment.tasks[task_index] = updated_task;
-            storage.save_fragment(&path, &fragment)?;
-
-            // Cleanup
-            let _ = fs::remove_file(&temp_path);
-
-            // Sync
-            roadmap::generate_roadmaps(&storage, &PathBuf::from("."))?;
-
-            println!("Updated task {}", task_id);
-        }
+        } => commands::move_task(&storage, task_id, milestone),
+        Commands::Delete { task_id } => commands::delete(&storage, task_id),
+        Commands::Edit { task_id } => commands::edit(&storage, task_id),
     }
-
-    Ok(())
 }

@@ -37,7 +37,10 @@ description = ""
 task_type = "feature"
 status = "backlog"
 priority = 0
-subtask_uids = ["48e50e17-5b4c-4157-ac37-308f4a1ecd30"]
+subtask_uids = [
+    "48e50e17-5b4c-4157-ac37-308f4a1ecd30",
+    "7f5597e9-7c08-48dd-bc0d-97cbe99f2431",
+]
 milestone_id = "M3"
 designs = []
 tags = []
@@ -67,5 +70,37 @@ updated_at = "2026-05-02T19:07:55.650989Z"
 
 [tasks.execution]
 logs = []
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-15"
+uid = "7f5597e9-7c08-48dd-bc0d-97cbe99f2431"
+title = "Refactor main.rs into modular command handlers"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+parent_id = "6d526ad9-9b0b-4093-862e-ee0503171656"
+subtask_uids = []
+milestone_id = "M3"
+tags = []
+created_at = "2026-05-02T19:17:03.934031Z"
+updated_at = "2026-05-02T19:25:26.442857Z"
+completed_at = "2026-05-02T19:25:26.442857Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M3/TF-15/lld-refactor-main.rs.md"
+status = "draft"
+created_at = "2026-05-02T19:17:06.323148Z"
+updated_at = "2026-05-02T19:17:06.323148Z"
+
+[tasks.execution]
+agent_id = "Gemini CLI"
+start_time = "2026-05-02T19:17:06.317867Z"
+end_time = "2026-05-02T19:25:26.438079Z"
+logs = ["Successfully modularized all CLI commands into separate files under src/commands/."]
+outcome = "success"
 
 [tasks.metadata]
