@@ -103,6 +103,8 @@ pub struct MilestoneMetadata {
     pub status: Status,
     pub path: String,        // e.g., "roadmap/M1.toml"
     #[serde(default)]
+    pub priority: u8,
+    #[serde(default)]
     pub designs: Vec<Design>,
 }
 

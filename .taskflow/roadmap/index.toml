@@ -1,7 +1,6 @@
 name = "TaskFlowAI Core"
 description = ""
 version = "0.1.0"
-archived_milestones = []
 backlog_path = "roadmap/backlog.toml"
 
 [[milestones]]
@@ -10,6 +9,7 @@ name = "Design Phase"
 description = ""
 status = "todo"
 path = "roadmap/M1.toml"
+priority = 0
 
 [[milestones.designs]]
 design_type = "hld"
@@ -24,6 +24,7 @@ name = "Core Commands & Refinement"
 description = ""
 status = "todo"
 path = "roadmap/M2.toml"
+priority = 0
 designs = []
 
 [[milestones]]
@@ -32,6 +33,7 @@ name = "Advanced Features"
 description = ""
 status = "todo"
 path = "roadmap/M3.toml"
+priority = 0
 designs = []
 
 [[milestones]]
@@ -40,6 +42,7 @@ name = "Self-Hosting & Validation"
 description = ""
 status = "todo"
 path = "roadmap/M4.toml"
+priority = 0
 designs = []
 
 [[milestones]]
@@ -48,6 +51,31 @@ name = "Provider Skills Integration"
 description = ""
 status = "todo"
 path = "roadmap/M5.toml"
+priority = 0
+designs = []
+
+[[milestones]]
+id = "M6"
+name = "Milestone Priority Support"
+description = ""
+status = "todo"
+path = "roadmap/M6.toml"
+priority = 10
+
+[[milestones.designs]]
+design_type = "lld"
+path = "docs/designs/M6/lld-milestone-priority-support.md"
+status = "draft"
+created_at = "2026-05-03T18:15:29.602193Z"
+updated_at = "2026-05-03T18:15:29.602193Z"
+
+[[archived_milestones]]
+id = "M7"
+name = "Super High Priority"
+description = ""
+status = "todo"
+path = "archive/M7.toml"
+priority = 255
 designs = []
 
 [config]

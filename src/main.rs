@@ -107,6 +107,16 @@ enum MilestoneCommands {
     Create {
         id: String, // e.g., M1
         name: String,
+        #[arg(short, long, default_value_t = 0)]
+        priority: u8,
+    },
+    /// Edit an existing milestone
+    Edit {
+        id: String,
+        #[arg(short, long)]
+        name: Option<String>,
+        #[arg(short, long)]
+        priority: Option<u8>,
     },
     /// List all milestones
     List,
@@ -196,7 +206,8 @@ fn main() -> Result<()> {
         Commands::Sync => commands::sync(&storage),
         Commands::Dashboard => commands::dashboard(&storage),
         Commands::Milestone { command } => match command {
-            MilestoneCommands::Create { id, name } => commands::milestone_create(&storage, id, name),
+            MilestoneCommands::Create { id, name, priority } => commands::milestone_create(&storage, id, name, priority),
+            MilestoneCommands::Edit { id, name, priority } => commands::milestone_edit(&storage, id, name, priority),
             MilestoneCommands::List => commands::milestone_list(&storage),
         },
         Commands::Execute { command } => match command {

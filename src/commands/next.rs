@@ -6,8 +6,11 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
     let project = storage.load_project()?;
     let mut next_task = None;
 
-    // 1. Check Milestones
-    for ms in &project.milestones {
+    // 1. Check Milestones (sorted by priority)
+    let mut sorted_milestones = project.milestones.clone();
+    sorted_milestones.sort_by(|a, b| b.priority.cmp(&a.priority));
+
+    for ms in &sorted_milestones {
         let fragment = storage.load_fragment(&ms.path)?;
 
         if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::InProgress) {

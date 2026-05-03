@@ -35,6 +35,7 @@ pub use execute::complete as execute_complete;
 pub use design::init as design_init;
 pub use design::set_status as design_set_status;
 pub use milestone::create as milestone_create;
+pub use milestone::edit as milestone_edit;
 pub use milestone::list as milestone_list;
 pub use meta::set as meta_set;
 pub use validate::run as validate;

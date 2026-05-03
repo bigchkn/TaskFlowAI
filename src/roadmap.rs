@@ -22,6 +22,9 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
             if let Some(date) = ms.target_date {
                 active_md.push_str(&format!("**Target Date:** {}\n", date.format("%Y-%m-%d")));
             }
+            if ms.priority > 0 {
+                active_md.push_str(&format!("**Priority:** {}\n", ms.priority));
+            }
             active_md.push_str(&format!("**Status:** {:?}\n\n", ms.status));
 
             if !ms.designs.is_empty() {
@@ -91,6 +94,9 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
     } else {
         for ms in &project.archived_milestones {
             archive_md.push_str(&format!("### {} ({})\n", ms.name, ms.id));
+            if ms.priority > 0 {
+                archive_md.push_str(&format!("**Priority:** {}\n", ms.priority));
+            }
             archive_md.push_str(&format!("**Status:** {:?}\n\n", ms.status));
 
             if !ms.designs.is_empty() {

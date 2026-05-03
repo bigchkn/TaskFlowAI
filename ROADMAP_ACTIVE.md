@@ -52,6 +52,19 @@
 - [x] **TF-17**: Refine skill command with view and install subcommands(`Done`)
   - [Lld] docs/designs/M5/TF-17/lld-skill-command-refinement.md (`Approved`)
 
+### Milestone Priority Support (M6)
+**Priority:** 10
+**Status:** Todo
+
+**Designs:**
+- [Lld] docs/designs/M6/lld-milestone-priority-support.md (`Draft`)
+
+- [x] **TF-18**: Update MilestoneMetadata model to include priority(`Done`)
+- [x] **TF-19**: Update milestone create and add milestone edit command(`Done`)
+- [x] **TF-20**: Update next command to respect milestone priority(`Done`)
+- [x] **TF-21**: Update roadmap generation to include priority(`Done`)
+- [x] **TF-22**: Final validation and sync(`Done`)
+
 ## Backlog
 
 _Backlog is empty._

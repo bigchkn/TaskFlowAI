@@ -1,0 +1,124 @@
+[[tasks]]
+id = "TF-18"
+uid = "607d219a-a70f-41b0-ad49-b552c3adf85f"
+title = "Update MilestoneMetadata model to include priority"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M6"
+designs = []
+tags = []
+created_at = "2026-05-03T18:13:28.716066Z"
+updated_at = "2026-05-03T18:15:52.884900Z"
+completed_at = "2026-05-03T18:15:52.884900Z"
+
+[tasks.execution]
+agent_id = "GeminiCLI"
+start_time = "2026-05-03T18:15:40.618831Z"
+end_time = "2026-05-03T18:15:52.884897Z"
+logs = ["Updated MilestoneMetadata model with priority field and fixed compilation."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-19"
+uid = "765f3ed8-79e5-4099-a252-d52eb72c7094"
+title = "Update milestone create and add milestone edit command"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M6"
+designs = []
+tags = []
+created_at = "2026-05-03T18:13:29.003866Z"
+updated_at = "2026-05-03T18:16:22.230417Z"
+completed_at = "2026-05-03T18:16:22.230417Z"
+
+[tasks.execution]
+agent_id = "GeminiCLI"
+start_time = "2026-05-03T18:15:55.213091Z"
+end_time = "2026-05-03T18:16:22.230416Z"
+logs = ["Updated milestone create with priority and added milestone edit command."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-20"
+uid = "ed6703f3-dc62-48e3-a356-0f6e6d5f6f82"
+title = "Update next command to respect milestone priority"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M6"
+designs = []
+tags = []
+created_at = "2026-05-03T18:13:29.305666Z"
+updated_at = "2026-05-03T18:16:56.628360Z"
+completed_at = "2026-05-03T18:16:56.628359Z"
+
+[tasks.execution]
+agent_id = "GeminiCLI"
+start_time = "2026-05-03T18:16:24.274384Z"
+end_time = "2026-05-03T18:16:56.628359Z"
+logs = ["Updated next command to sort milestones by priority descending."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-21"
+uid = "7fbf2a8c-c086-4726-b744-e8caecef393a"
+title = "Update roadmap generation to include priority"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M6"
+designs = []
+tags = []
+created_at = "2026-05-03T18:13:29.594274Z"
+updated_at = "2026-05-03T18:18:00.200270Z"
+completed_at = "2026-05-03T18:18:00.200270Z"
+
+[tasks.execution]
+agent_id = "GeminiCLI"
+start_time = "2026-05-03T18:16:58.947500Z"
+end_time = "2026-05-03T18:18:00.200269Z"
+logs = ["Updated roadmap generation to display milestone priority and fixed bug in archive generation."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-22"
+uid = "492ea0b8-0f82-4ec0-a43f-a02ada4082e1"
+title = "Final validation and sync"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M6"
+designs = []
+tags = []
+created_at = "2026-05-03T18:13:29.911605Z"
+updated_at = "2026-05-03T18:18:15.114146Z"
+completed_at = "2026-05-03T18:18:15.114145Z"
+
+[tasks.execution]
+agent_id = "GeminiCLI"
+start_time = "2026-05-03T18:18:02.441301Z"
+end_time = "2026-05-03T18:18:15.114145Z"
+logs = ["Final validation and cleanup complete. Verified create, edit, next, and roadmap sync."]
+outcome = "success"
+
+[tasks.metadata]
