@@ -14,17 +14,17 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
         let fragment = storage.load_fragment(&ms.path)?;
 
         if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::InProgress) {
-            next_task = Some((task.clone(), ms.name.clone()));
+            next_task = Some((task.clone(), Some(ms.clone())));
             break;
         }
 
         if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::Todo) {
-            next_task = Some((task.clone(), ms.name.clone()));
+            next_task = Some((task.clone(), Some(ms.clone())));
             break;
         }
 
         if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::Backlog) {
-            next_task = Some((task.clone(), ms.name.clone()));
+            next_task = Some((task.clone(), Some(ms.clone())));
             break;
         }
     }
@@ -33,20 +33,44 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
     if next_task.is_none() {
         let backlog = storage.load_fragment(&project.backlog_path)?;
         if let Some(task) = backlog.tasks.iter().find(|t| t.status != Status::Done && t.status != Status::Canceled) {
-            next_task = Some((task.clone(), "Global Backlog".to_string()));
+            next_task = Some((task.clone(), None));
         }
     }
 
-    if let Some((task, ms_name)) = next_task {
+    if let Some((task, ms_meta)) = next_task {
         println!(">>> Next Task: {} - {}", task.id, task.title);
-        println!("Milestone: {}", ms_name);
+        println!("Milestone: {}", ms_meta.as_ref().map(|m| m.name.as_str()).unwrap_or("Global Backlog"));
         println!("Status:    {:?}", task.status);
         println!("Priority:  {}", task.priority);
 
-        if !task.designs.is_empty() {
-            println!("\nDesigns:");
-            for design in &task.designs {
-                println!("  - [{:?}] {} (`{:?}`)", design.design_type, design.path, design.status);
+        let mut all_designs = Vec::new();
+
+        // Milestone designs
+        if let Some(ms) = ms_meta {
+            for design in ms.designs {
+                all_designs.push(("Milestone", design));
+            }
+        }
+
+        // Parent designs
+        if let Some(parent_uid) = task.parent_id {
+            let all_tasks = storage.load_all_tasks()?;
+            if let Some(parent) = all_tasks.iter().find(|t| t.uid == parent_uid) {
+                for design in &parent.designs {
+                    all_designs.push(("Parent", design.clone()));
+                }
+            }
+        }
+
+        // Task designs
+        for design in &task.designs {
+            all_designs.push(("Task", design.clone()));
+        }
+
+        if !all_designs.is_empty() {
+            println!("\nRelevant Designs:");
+            for (source, design) in all_designs {
+                println!("  - [{}] [{:?}] {} (`{:?}`)", source, design.design_type, design.path, design.status);
             }
         }
 

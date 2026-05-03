@@ -1,0 +1,26 @@
+[[tasks]]
+id = "TF-23"
+uid = "0eb210d8-6286-4233-9d6d-bf1d1475a3d9"
+title = "Include relevant design docs in 'next' command output"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = ["9cef1550-8763-4940-9f5a-7f8180df41ae"]
+milestone_id = "M8"
+tags = []
+created_at = "2026-05-03T19:08:33.337977Z"
+updated_at = "2026-05-03T19:10:47.744381Z"
+completed_at = "2026-05-03T19:10:47.744382Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M8/TF-23/lld-implementation-details-for-tf-23.md"
+status = "draft"
+created_at = "2026-05-03T19:10:33.569785Z"
+updated_at = "2026-05-03T19:10:33.569785Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

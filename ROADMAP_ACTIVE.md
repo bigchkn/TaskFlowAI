@@ -65,6 +65,16 @@
 - [x] **TF-21**: Update roadmap generation to include priority(`Done`)
 - [x] **TF-22**: Final validation and sync(`Done`)
 
+### Improve Next Command Display (M8)
+**Priority:** 255
+**Status:** Todo
+
+**Designs:**
+- [Lld] docs/designs/M8/lld-improve-next-command-output.md (`Draft`)
+
+- [x] **TF-23**: Include relevant design docs in 'next' command output(`Done`)
+  - [Lld] docs/designs/M8/TF-23/lld-implementation-details-for-tf-23.md (`Draft`)
+
 ## Backlog
 
 _Backlog is empty._
