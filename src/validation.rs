@@ -80,25 +80,7 @@ fn validate_design_file(project_root: &Path, relative_path: &str, design_type: D
 
     let content = fs::read_to_string(&full_path)?;
 
-    let required_headers = match design_type {
-        DesignType::Hld => vec![
-            "# High-Level Design:",
-            "## 1. Introduction",
-            "## 2. Goals",
-            "## 3. Architecture",
-            "## 4. Components",
-        ],
-        DesignType::Lld => vec![
-            "# Low-Level Design:",
-            "## 1. Objective",
-            "## 2. Architecture",
-            "## 3. Implementation Details",
-            "## 4. Verification Plan",
-        ],
-        DesignType::Rfc => vec![
-            "# RFC:",
-        ],
-    };
+    let required_headers = design_type.required_headers();
 
     for header in required_headers {
         if !content.contains(header) {

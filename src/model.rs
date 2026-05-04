@@ -33,6 +33,30 @@ pub enum DesignType {
     Rfc,
 }
 
+impl DesignType {
+    pub fn required_headers(&self) -> Vec<&'static str> {
+        match self {
+            DesignType::Hld => vec![
+                "# High-Level Design:",
+                "## 1. Introduction",
+                "## 2. Goals",
+                "## 3. Architecture",
+                "## 4. Components",
+            ],
+            DesignType::Lld => vec![
+                "# Low-Level Design:",
+                "## 1. Objective",
+                "## 2. Architecture",
+                "## 3. Implementation Details",
+                "## 4. Verification Plan",
+            ],
+            DesignType::Rfc => vec![
+                "# RFC:",
+            ],
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum DesignStatus {

@@ -21,6 +21,7 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
    - Run `taskflow-ai templates list` to see available task types if creating a new task.
 2. **Research & Design**:
    - Read the linked HLD/LLDs.
+   - Use `taskflow-ai design templates show <type>` to view required headers for a design type.
    - If a new design is needed, run `taskflow-ai design init <hld|lld> <Title> --milestone <M_ID> [--task <TF_ID>]`.
    - Populate the scaffolded Markdown file.
 3. **Execute**:

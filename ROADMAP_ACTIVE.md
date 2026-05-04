@@ -90,6 +90,14 @@
   - [ ] **TF-28**: Write LLD (Parent: TF-27)(`Backlog`)
   - [ ] **TF-29**: Implementation (Parent: TF-27)(`Backlog`)
 
+### Design Template CLI Support (M10)
+**Priority:** 255
+**Status:** Todo
+
+- [x] **TF-30**: Design: Design Template CLI Command(`Done`)
+- [x] **TF-31**: Implementation: Design Template CLI Command(`Done`)
+- [x] **TF-32**: Update: taskflow-ai Skill Documentation(`Done`)
+
 ## Backlog
 
 _Backlog is empty._

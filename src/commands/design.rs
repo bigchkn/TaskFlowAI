@@ -104,10 +104,62 @@ pub fn set_status<S: Storage>(
     Ok(())
 }
 
+pub fn templates_list() -> Result<()> {
+    println!("{:<15} | {:<20} | {:<40}", "DESIGN TYPE", "LOCAL TEMPLATE", "REQUIRED HEADERS COUNT");
+    println!("{}", "-".repeat(80));
+
+    for d_type in [DesignType::Hld, DesignType::Lld, DesignType::Rfc] {
+        let type_str = match d_type {
+            DesignType::Hld => "hld",
+            DesignType::Lld => "lld",
+            DesignType::Rfc => "rfc",
+        };
+        let template_path = format!(".taskflow/templates/designs/{}.md", type_str);
+        let local_status = if std::path::Path::new(&template_path).exists() { "Present" } else { "Missing (Using Hardcoded)" };
+        let req_count = d_type.required_headers().len();
+        
+        println!("{:<15} | {:<20} | {:<40}", type_str.to_uppercase(), local_status, req_count);
+    }
+    Ok(())
+}
+
+pub fn templates_show(design_type: &str) -> Result<()> {
+    let d_type = parse_design_type(design_type)?;
+    let type_str = design_type.to_lowercase();
+    
+    println!("--------------------------------------------------");
+    println!("DESIGN TEMPLATE: {}", type_str.to_uppercase());
+    println!("--------------------------------------------------");
+    
+    println!("REQUIRED HEADERS (Validation Enforced):");
+    let headers = d_type.required_headers();
+    if headers.is_empty() {
+        println!("  (None)");
+    } else {
+        for header in headers {
+            println!("  - {}", header);
+        }
+    }
+    println!("--------------------------------------------------");
+    
+    let template_path = format!(".taskflow/templates/designs/{}.md", type_str);
+    if std::path::Path::new(&template_path).exists() {
+        println!("LOCAL SCAFFOLDING TEMPLATE (.taskflow/templates/designs/{}.md):", type_str);
+        let content = fs::read_to_string(&template_path)?;
+        println!("\n{}", content.trim());
+    } else {
+        println!("LOCAL SCAFFOLDING TEMPLATE: Missing (Will use minimal fallback)");
+    }
+    println!("--------------------------------------------------");
+
+    Ok(())
+}
+
 fn parse_design_type(s: &str) -> Result<DesignType> {
     match s.to_lowercase().as_str() {
         "hld" => Ok(DesignType::Hld),
         "lld" => Ok(DesignType::Lld),
+        "rfc" => Ok(DesignType::Rfc),
         _ => Err(anyhow::anyhow!("Invalid design type: {}", s)),
     }
 }

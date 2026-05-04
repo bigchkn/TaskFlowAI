@@ -175,6 +175,22 @@ enum DesignCommands {
         #[arg(short, long)]
         task: Option<String>,
     },
+    /// Manage design templates
+    Templates {
+        #[command(subcommand)]
+        command: DesignTemplateCommands,
+    },
+}
+
+#[derive(Subcommand)]
+enum DesignTemplateCommands {
+    /// List available design types and their local template status
+    List,
+    /// Show requirements and template content for a specific design type
+    Show {
+        /// The design type (hld, lld, rfc)
+        design_type: String,
+    },
 }
 
 #[derive(Subcommand)]
@@ -254,7 +270,12 @@ fn main() -> Result<()> {
                 milestone,
                 task,
             } => commands::design_set_status(&storage, path, status, milestone, task),
+            DesignCommands::Templates { command } => match command {
+                DesignTemplateCommands::List => commands::design::templates_list(),
+                DesignTemplateCommands::Show { design_type } => commands::design::templates_show(&design_type),
+            },
         },
+
         Commands::Validate { task_id } => commands::validate(&storage, task_id),
         Commands::Next => commands::next(&storage),
         Commands::Skill { command } => commands::skill(command),
