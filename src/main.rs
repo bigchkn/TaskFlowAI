@@ -33,6 +33,8 @@ enum Commands {
         milestone: Option<String>,
         #[arg(short, long)]
         parent: Option<String>,
+        #[arg(short = 'T', long)]
+        template: Option<String>,
     },
     /// List all tasks
     List {
@@ -196,7 +198,8 @@ fn main() -> Result<()> {
             task_type,
             milestone,
             parent,
-        } => commands::add(&storage, title, task_type, milestone, parent),
+            template,
+        } => commands::add(&storage, title, task_type, milestone, parent, template),
         Commands::List { milestone } => commands::list(&storage, milestone),
         Commands::Status {
             task_id,

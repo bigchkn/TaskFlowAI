@@ -1,4 +1,3 @@
-use crate::model::{Task, TaskType};
 use crate::storage::Storage;
 use crate::roadmap;
 use anyhow::{Context, Result};
@@ -10,13 +9,14 @@ pub fn run<S: Storage>(
     task_type: Option<String>,
     milestone: Option<String>,
     parent: Option<String>,
+    template_name: Option<String>,
 ) -> Result<()> {
     let project = storage.load_project()?;
     let t_type = match task_type.as_deref() {
-        Some("bug") => TaskType::Bug,
-        Some("chore") => TaskType::Chore,
-        Some("research") => TaskType::Research,
-        _ => TaskType::Feature,
+        Some("bug") => crate::model::TaskType::Bug,
+        Some("chore") => crate::model::TaskType::Chore,
+        Some("research") => crate::model::TaskType::Research,
+        _ => crate::model::TaskType::Feature,
     };
 
     let all_tasks = storage.load_all_tasks()?;
@@ -26,7 +26,33 @@ pub fn run<S: Storage>(
         .max()
         .unwrap_or(0);
     let next_id = format!("TF-{}", max_id + 1);
-    let mut task = Task::new(next_id, title, t_type);
+    let mut task = crate::model::Task::new(next_id.clone(), title, t_type);
+
+    // Load template if provided or configured
+    let t_name = template_name.or_else(|| {
+        project.config.get("default_template")
+            .filter(|v| !v.trim().is_empty())
+            .cloned()
+    });
+    
+    // Check if templates are forced
+    if t_name.is_none() && parent.is_none() && project.config.get("force_templates").map(|v| v == "true").unwrap_or(false) {
+        return Err(anyhow::anyhow!("Project configuration 'force_templates' is enabled. You must provide a template with --template or set a 'default_template'."));
+    }
+
+    let mut template = None;
+    if let Some(name) = t_name {
+        let template_path = std::env::current_dir()?.join(".taskflow/templates/tasks").join(format!("{}.toml", name));
+        if template_path.exists() {
+            let content = std::fs::read_to_string(template_path)?;
+            let t: crate::model::TaskTemplate = toml::from_str(&content)?;
+            task.metadata.insert("template".to_string(), name.clone());
+            for (k, _v) in &t.required_metadata {
+                task.metadata.insert(k.clone(), String::new());
+            }
+            template = Some(t);
+        }
+    }
 
     // Handle parent linkage
     let parent_ms_id = if let Some(ref parent_id) = parent {
@@ -83,6 +109,26 @@ pub fn run<S: Storage>(
             fragment.tasks.last().unwrap().id,
             parent
         );
+    }
+
+    // Scaffold subtasks from template
+    if let Some(t) = template {
+        for sub in t.default_subtasks {
+            let sub_type = Some(match sub.task_type {
+                crate::model::TaskType::Bug => "bug".to_string(),
+                crate::model::TaskType::Chore => "chore".to_string(),
+                crate::model::TaskType::Research => "research".to_string(),
+                _ => "feature".to_string(),
+            });
+            run(
+                storage,
+                sub.title,
+                sub_type,
+                None, // Inherit milestone from parent (handled in run)
+                Some(next_id.clone()),
+                None, // Don't apply templates recursively to subtasks for now
+            )?;
+        }
     }
     Ok(())
 }

@@ -51,6 +51,29 @@ pub struct Design {
     pub updated_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaskTemplate {
+    pub name: String,
+    pub description: String,
+    #[serde(default)]
+    pub required_metadata: IndexMap<String, String>,
+    #[serde(default)]
+    pub default_subtasks: Vec<SubtaskTemplate>,
+    #[serde(default)]
+    pub required_designs: Vec<DesignRequirement>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubtaskTemplate {
+    pub title: String,
+    pub task_type: TaskType,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DesignRequirement {
+    pub design_type: DesignType,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Execution {
     pub agent_id: Option<String>,

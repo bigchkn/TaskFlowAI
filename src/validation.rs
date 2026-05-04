@@ -23,6 +23,36 @@ pub fn validate_task<S: Storage>(storage: &S, project_root: &Path, task_id: &str
         validate_design_file(project_root, &design.path, design.design_type)?;
     }
 
+    // 3. Check Task Template
+    if let Some(template_name) = task.metadata.get("template") {
+        let template_path = project_root.join(".taskflow/templates/tasks").join(format!("{}.toml", template_name));
+        if template_path.exists() {
+            println!("  - Validating against template: {}", template_name);
+            let content = fs::read_to_string(template_path)?;
+            let template: crate::model::TaskTemplate = toml::from_str(&content)?;
+
+            // Check required metadata
+            for (key, _) in &template.required_metadata {
+                if let Some(value) = task.metadata.get(key) {
+                    if value.trim().is_empty() {
+                        return Err(anyhow::anyhow!("Task {} is missing required metadata field: '{}'", task.id, key));
+                    }
+                } else {
+                    return Err(anyhow::anyhow!("Task {} is missing required metadata field: '{}'", task.id, key));
+                }
+            }
+
+            // Check required designs
+            for req in &template.required_designs {
+                let has_design = task.designs.iter().any(|d| d.design_type == req.design_type);
+                if !has_design {
+                    return Err(anyhow::anyhow!("Task {} is missing required design type: {:?}", task.id, req.design_type));
+                }
+            }
+            println!("  - Template validation passed.");
+        }
+    }
+
     Ok(())
 }
 

@@ -64,7 +64,7 @@ TaskFlowAI is primarily interacted with via a CLI. The commands are designed to 
 
 ### 5.1 Initialization & Configuration
 *   `taskflow-ai init [PROJECT_NAME]`: Initializes a new `.taskflow/` directory structure, including default templates and the initial `roadmap/index.toml`.
-*   `taskflow-ai config <KEY> [VALUE]`: Gets or sets project-level configuration (e.g., default task template, archive retention policy).
+*   `taskflow-ai config <KEY> [VALUE]`: Gets or sets project-level configuration (e.g., default task template, force_templates, archive retention policy).
 
 ### 5.2 Task & Milestone Management
 *   `taskflow-ai add <TITLE> [--type <TYPE>] [--milestone <M_ID>] [--template <TPL_NAME>]`: Creates a new task. If `--milestone` is omitted, it goes to the backlog. If `--template` is provided, it scaffolds subtasks and metadata requirements.

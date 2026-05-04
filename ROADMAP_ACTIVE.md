@@ -75,6 +75,14 @@
 - [x] **TF-23**: Include relevant design docs in 'next' command output(`Done`)
   - [Lld] docs/designs/M8/TF-23/lld-implementation-details-for-tf-23.md (`Draft`)
 
+### Task Templates & Workflow Enforcement (M9)
+**Priority:** 255
+**Status:** Todo
+
+**Designs:**
+- [Lld] docs/designs/M9/lld-task-templates-implementation.md (`Draft`)
+
+
 ## Backlog
 
 _Backlog is empty._
