@@ -101,6 +101,19 @@ enum Commands {
         key: String,
         value: Option<String>,
     },
+    /// Manage task templates
+    Templates {
+        #[command(subcommand)]
+        command: TemplateCommands,
+    },
+}
+
+#[derive(Subcommand)]
+enum TemplateCommands {
+    /// List all available templates
+    List,
+    /// Show details of a specific template
+    Show { name: String },
 }
 
 #[derive(Subcommand)]
@@ -253,5 +266,9 @@ fn main() -> Result<()> {
         Commands::Edit { task_id } => commands::edit(&storage, task_id),
         Commands::Show { task_id } => commands::show(&storage, task_id),
         Commands::Config { key, value } => commands::config(&storage, key, value),
+        Commands::Templates { command } => match command {
+            TemplateCommands::List => commands::templates::list(),
+            TemplateCommands::Show { name } => commands::templates::show(&name),
+        },
     }
 }

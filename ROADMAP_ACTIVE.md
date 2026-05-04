@@ -82,6 +82,13 @@
 **Designs:**
 - [Lld] docs/designs/M9/lld-task-templates-implementation.md (`Draft`)
 
+- [x] **TF-24**: Update taskflow-ai skill with Task Template instructions(`Done`)
+  - [ ] **TF-25**: Write LLD (Parent: TF-24)(`Backlog`)
+  - [ ] **TF-26**: Implementation (Parent: TF-24)(`Backlog`)
+- [x] **TF-27**: Implement 'templates list' sub-command(`Done`)
+  - [Lld] docs/designs/M9/TF-27/lld-templates-command-implementation.md (`Draft`)
+  - [ ] **TF-28**: Write LLD (Parent: TF-27)(`Backlog`)
+  - [ ] **TF-29**: Implementation (Parent: TF-27)(`Backlog`)
 
 ## Backlog
 

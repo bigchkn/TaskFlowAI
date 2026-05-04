@@ -16,7 +16,9 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 3. **Automated Roadmaps**: `ROADMAP_ACTIVE.md` is automatically generated from the TOML fragments. Never edit it manually.
 
 ## Standard Workflow
-1. **Discover**: Run `taskflow-ai next` to find the highest priority task and its associated designs.
+1. **Discover**: 
+   - Run `taskflow-ai next` to find the highest priority task and its associated designs.
+   - Run `taskflow-ai templates list` to see available task types if creating a new task.
 2. **Research & Design**:
    - Read the linked HLD/LLDs.
    - If a new design is needed, run `taskflow-ai design init <hld|lld> <Title> --milestone <M_ID> [--task <TF_ID>]`.
@@ -32,6 +34,7 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 - `.taskflow/roadmap/index.toml`: Project metadata and milestone index.
 - `.taskflow/roadmap/M*.toml`: Milestone fragments containing tasks.
 - `.taskflow/templates/designs/`: Markdown templates for HLD/LLD.
+- `.taskflow/templates/tasks/`: TOML templates for different task types.
 - `docs/designs/`: Human-readable design documents.
 - `ROADMAP_ACTIVE.md`: The generated project view.
 "#;

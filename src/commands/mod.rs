@@ -15,6 +15,7 @@ pub mod milestone;
 pub mod meta;
 pub mod validate;
 pub mod init;
+pub mod templates;
 
 pub mod show;
 pub mod config;
