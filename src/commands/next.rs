@@ -13,7 +13,11 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
     for ms in &sorted_milestones {
         let fragment = storage.load_fragment(&ms.path)?;
 
-        if let Some(task) = fragment.tasks.iter().find(|t| t.status == Status::InProgress) {
+        if let Some(task) = fragment
+            .tasks
+            .iter()
+            .find(|t| t.status == Status::InProgress)
+        {
             next_task = Some((task.clone(), Some(ms.clone())));
             break;
         }
@@ -32,14 +36,24 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
     // 2. Check Global Backlog
     if next_task.is_none() {
         let backlog = storage.load_fragment(&project.backlog_path)?;
-        if let Some(task) = backlog.tasks.iter().find(|t| t.status != Status::Done && t.status != Status::Canceled) {
+        if let Some(task) = backlog
+            .tasks
+            .iter()
+            .find(|t| t.status != Status::Done && t.status != Status::Canceled)
+        {
             next_task = Some((task.clone(), None));
         }
     }
 
     if let Some((task, ms_meta)) = next_task {
         println!(">>> Next Task: {} - {}", task.id, task.title);
-        println!("Milestone: {}", ms_meta.as_ref().map(|m| m.name.as_str()).unwrap_or("Global Backlog"));
+        println!(
+            "Milestone: {}",
+            ms_meta
+                .as_ref()
+                .map(|m| m.name.as_str())
+                .unwrap_or("Global Backlog")
+        );
         println!("Status:    {:?}", task.status);
         println!("Priority:  {}", task.priority);
 
@@ -70,7 +84,10 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
         if !all_designs.is_empty() {
             println!("\nRelevant Designs:");
             for (source, design) in all_designs {
-                println!("  - [{}] [{:?}] {} (`{:?}`)", source, design.design_type, design.path, design.status);
+                println!(
+                    "  - [{}] [{:?}] {} (`{:?}`)",
+                    source, design.design_type, design.path, design.status
+                );
             }
         }
 

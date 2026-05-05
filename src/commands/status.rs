@@ -1,9 +1,9 @@
 use crate::model::Status;
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
-use std::env;
 use chrono::Utc;
+use std::env;
 
 pub fn run<S: Storage>(storage: &S, task_id: String, new_status: String) -> Result<()> {
     let status = parse_status(&new_status)?;

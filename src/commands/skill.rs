@@ -1,6 +1,6 @@
-use anyhow::{Result, bail, Context};
-use std::fs;
 use crate::SkillCommands;
+use anyhow::{Context, Result, bail};
+use std::fs;
 
 pub const TASKFLOW_SKILL_PROMPT: &str = r#"---
 name: taskflow
@@ -49,22 +49,27 @@ pub fn run(command: Option<SkillCommands>) -> Result<()> {
         }
         SkillCommands::Install { provider } => {
             let home = std::env::var("HOME").context("Could not find HOME environment variable")?;
-            
+
             let skill_path = match provider.to_lowercase().as_str() {
                 "claude" => format!("{}/.claude/skills/taskflow/SKILL.md", home),
                 "gemini" => format!("{}/.gemini/skills/taskflow/SKILL.md", home),
                 "codex" => format!("{}/.codex/skills/taskflow/SKILL.md", home),
                 "dirac" => format!("{}/.dirac/skills/taskflow/SKILL.md", home),
                 "opencode" => format!("{}/.config/opencode/skill/taskflow/SKILL.md", home),
-                _ => bail!("Unsupported provider: {}. Supported providers are: claude, gemini, codex, dirac, opencode", provider),
+                _ => bail!(
+                    "Unsupported provider: {}. Supported providers are: claude, gemini, codex, dirac, opencode",
+                    provider
+                ),
             };
 
             let path = std::path::Path::new(&skill_path);
             if let Some(parent) = path.parent() {
-                fs::create_dir_all(parent).with_context(|| format!("Failed to create directory: {:?}", parent))?;
+                fs::create_dir_all(parent)
+                    .with_context(|| format!("Failed to create directory: {:?}", parent))?;
             }
 
-            fs::write(path, TASKFLOW_SKILL_PROMPT).with_context(|| format!("Failed to write skill to: {:?}", path))?;
+            fs::write(path, TASKFLOW_SKILL_PROMPT)
+                .with_context(|| format!("Failed to write skill to: {:?}", path))?;
             println!("Successfully installed TaskFlowAI skill to {}", skill_path);
         }
     }

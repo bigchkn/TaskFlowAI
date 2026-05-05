@@ -1,10 +1,10 @@
 use crate::model::Project;
-use crate::storage::Storage;
-use crate::roadmap;
 use crate::model::TaskFragment;
+use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
-use std::env;
 use indexmap::IndexMap;
+use std::env;
 
 pub fn run<S: Storage>(storage: &S, name: String) -> Result<()> {
     let project = Project {

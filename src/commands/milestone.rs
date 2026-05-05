@@ -1,7 +1,7 @@
-use crate::model::{MilestoneMetadata, TaskFragment};
-use crate::storage::Storage;
-use crate::roadmap;
 use crate::model::Status;
+use crate::model::{MilestoneMetadata, TaskFragment};
+use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
 use std::env;
 
@@ -29,9 +29,17 @@ pub fn create<S: Storage>(storage: &S, id: String, name: String, priority: u8) -
     Ok(())
 }
 
-pub fn edit<S: Storage>(storage: &S, id: String, name: Option<String>, priority: Option<u8>) -> Result<()> {
+pub fn edit<S: Storage>(
+    storage: &S,
+    id: String,
+    name: Option<String>,
+    priority: Option<u8>,
+) -> Result<()> {
     let mut project = storage.load_project()?;
-    let milestone = project.milestones.iter_mut().find(|m| m.id == id)
+    let milestone = project
+        .milestones
+        .iter_mut()
+        .find(|m| m.id == id)
         .ok_or_else(|| anyhow::anyhow!("Milestone {} not found", id))?;
 
     if let Some(n) = name {
@@ -51,7 +59,10 @@ pub fn edit<S: Storage>(storage: &S, id: String, name: Option<String>, priority:
 pub fn list<S: Storage>(storage: &S) -> Result<()> {
     let project = storage.load_project()?;
     for ms in &project.milestones {
-        println!("{} - {} (priority: {}, path: {})", ms.id, ms.name, ms.priority, ms.path);
+        println!(
+            "{} - {} (priority: {}, path: {})",
+            ms.id, ms.name, ms.priority, ms.path
+        );
     }
     Ok(())
 }

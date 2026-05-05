@@ -1,5 +1,5 @@
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::{Context, Result};
 use std::env;
 use std::fs;
@@ -11,9 +11,7 @@ pub fn run<S: Storage>(storage: &S, storage_root: &Path, milestone_id: String) -
         .milestones
         .iter()
         .position(|m| m.id == milestone_id)
-        .with_context(|| {
-            format!("Milestone {} not found in active milestones", milestone_id)
-        })?;
+        .with_context(|| format!("Milestone {} not found in active milestones", milestone_id))?;
 
     let mut ms_meta = project.milestones.remove(index);
 

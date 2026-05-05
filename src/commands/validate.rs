@@ -5,7 +5,7 @@ use std::env;
 
 pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
     let project_root = env::current_dir()?;
-    
+
     // Check if it's a task first
     let all_tasks = storage.load_all_tasks()?;
     if all_tasks.iter().any(|t| t.id == task_id) {
@@ -20,5 +20,8 @@ pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
         return Ok(());
     }
 
-    Err(anyhow::anyhow!("Entity {} not found as task or milestone", task_id))
+    Err(anyhow::anyhow!(
+        "Entity {} not found as task or milestone",
+        task_id
+    ))
 }

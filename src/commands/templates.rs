@@ -19,7 +19,10 @@ pub fn list() -> Result<()> {
         if path.extension().and_then(|s| s.to_str()) == Some("toml") {
             let content = fs::read_to_string(&path)?;
             let t: TaskTemplate = toml::from_str(&content)?;
-            let name = path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown");
+            let name = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("unknown");
             println!("{:<20} | {:<50}", name, t.description);
         }
     }
@@ -39,7 +42,7 @@ pub fn show(name: &str) -> Result<()> {
     println!("TEMPLATE: {}", t.name);
     println!("Description: {}", t.description);
     println!("--------------------------------------------------");
-    
+
     if !t.required_metadata.is_empty() {
         println!("REQUIRED METADATA:");
         for (k, v) in &t.required_metadata {

@@ -1,11 +1,11 @@
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
 use std::env;
 
 pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
     let project = storage.load_project()?;
-    
+
     let mut found = false;
     let mut fragment = storage.load_fragment(&project.backlog_path)?;
     if let Some(pos) = fragment.tasks.iter().position(|t| t.id == task_id) {

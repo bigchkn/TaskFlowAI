@@ -1,6 +1,6 @@
 use crate::model::Task;
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
 use std::env;
 use std::fs;
@@ -10,11 +10,7 @@ pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
     let path = storage.find_task_path(&task_id)?;
     let mut fragment = storage.load_fragment(&path)?;
 
-    let task_index = fragment
-        .tasks
-        .iter()
-        .position(|t| t.id == task_id)
-        .unwrap();
+    let task_index = fragment.tasks.iter().position(|t| t.id == task_id).unwrap();
     let task = &fragment.tasks[task_index];
 
     // Create temporary file

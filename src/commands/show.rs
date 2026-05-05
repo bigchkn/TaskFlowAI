@@ -14,32 +14,42 @@ pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
     println!("Status: {:?}", task.status);
     println!("Priority: {}", task.priority);
     println!("--------------------------------------------------");
-    
+
     if let Some(ms) = &task.milestone_id {
         println!("Milestone: {}", ms);
     } else {
         println!("Milestone: Backlog");
     }
-    
+
     if let Some(parent) = task.parent_id {
         println!("Parent UID: {}", parent);
     }
-    
+
     if !task.subtask_uids.is_empty() {
         println!("Subtask UIDs: {:?}", task.subtask_uids);
     }
-    
+
     println!("--------------------------------------------------");
-    println!("Description: {}", if task.description.is_empty() { "None" } else { &task.description });
-    
+    println!(
+        "Description: {}",
+        if task.description.is_empty() {
+            "None"
+        } else {
+            &task.description
+        }
+    );
+
     if !task.designs.is_empty() {
         println!("--------------------------------------------------");
         println!("DESIGNS:");
         for design in &task.designs {
-            println!("  - [{:?}] {} ({:?})", design.design_type, design.path, design.status);
+            println!(
+                "  - [{:?}] {} ({:?})",
+                design.design_type, design.path, design.status
+            );
         }
     }
-    
+
     if !task.metadata.is_empty() {
         println!("--------------------------------------------------");
         println!("METADATA:");
@@ -47,14 +57,20 @@ pub fn run<S: Storage>(storage: &S, task_id: String) -> Result<()> {
             println!("  {}: {}", k, v);
         }
     }
-    
+
     println!("--------------------------------------------------");
     println!("EXECUTION:");
-    println!("  Agent: {}", task.execution.agent_id.as_deref().unwrap_or("None"));
+    println!(
+        "  Agent: {}",
+        task.execution.agent_id.as_deref().unwrap_or("None")
+    );
     println!("  Start: {:?}", task.execution.start_time);
     println!("  End:   {:?}", task.execution.end_time);
-    println!("  Outcome: {}", task.execution.outcome.as_deref().unwrap_or("Pending"));
-    
+    println!(
+        "  Outcome: {}",
+        task.execution.outcome.as_deref().unwrap_or("Pending")
+    );
+
     if !task.execution.logs.is_empty() {
         println!("  Logs:");
         for log in &task.execution.logs {

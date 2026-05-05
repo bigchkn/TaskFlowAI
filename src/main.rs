@@ -1,12 +1,12 @@
+mod commands;
 mod model;
 mod roadmap;
 mod storage;
 mod validation;
-mod commands;
 
 use crate::storage::FileStorage;
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(name = "taskflow-ai")]
@@ -97,14 +97,16 @@ enum Commands {
     /// Show detailed information about a task
     Show { task_id: String },
     /// Get or set project-level configuration
-    Config {
-        key: String,
-        value: Option<String>,
-    },
+    Config { key: String, value: Option<String> },
     /// Manage task templates
     Templates {
         #[command(subcommand)]
         command: TemplateCommands,
+    },
+    /// Generate shell completions
+    Completions {
+        /// The shell to generate completions for
+        shell: clap_complete::Shell,
     },
 }
 
@@ -234,16 +236,24 @@ fn main() -> Result<()> {
             task_id,
             new_status,
         } => commands::status(&storage, task_id, new_status),
-        Commands::Archive { milestone_id } => commands::archive(&storage, &storage_root, milestone_id),
+        Commands::Archive { milestone_id } => {
+            commands::archive(&storage, &storage_root, milestone_id)
+        }
         Commands::Sync => commands::sync(&storage),
         Commands::Dashboard => commands::dashboard(&storage),
         Commands::Milestone { command } => match command {
-            MilestoneCommands::Create { id, name, priority } => commands::milestone_create(&storage, id, name, priority),
-            MilestoneCommands::Edit { id, name, priority } => commands::milestone_edit(&storage, id, name, priority),
+            MilestoneCommands::Create { id, name, priority } => {
+                commands::milestone_create(&storage, id, name, priority)
+            }
+            MilestoneCommands::Edit { id, name, priority } => {
+                commands::milestone_edit(&storage, id, name, priority)
+            }
             MilestoneCommands::List => commands::milestone_list(&storage),
         },
         Commands::Execute { command } => match command {
-            ExecuteCommands::Start { task_id, agent } => commands::execute_start(&storage, task_id, agent),
+            ExecuteCommands::Start { task_id, agent } => {
+                commands::execute_start(&storage, task_id, agent)
+            }
             ExecuteCommands::Complete {
                 task_id,
                 outcome,
@@ -272,17 +282,16 @@ fn main() -> Result<()> {
             } => commands::design_set_status(&storage, path, status, milestone, task),
             DesignCommands::Templates { command } => match command {
                 DesignTemplateCommands::List => commands::design::templates_list(),
-                DesignTemplateCommands::Show { design_type } => commands::design::templates_show(&design_type),
+                DesignTemplateCommands::Show { design_type } => {
+                    commands::design::templates_show(&design_type)
+                }
             },
         },
 
         Commands::Validate { task_id } => commands::validate(&storage, task_id),
         Commands::Next => commands::next(&storage),
         Commands::Skill { command } => commands::skill(command),
-        Commands::Move {
-            task_id,
-            milestone,
-        } => commands::move_task(&storage, task_id, milestone),
+        Commands::Move { task_id, milestone } => commands::move_task(&storage, task_id, milestone),
         Commands::Delete { task_id } => commands::delete(&storage, task_id),
         Commands::Edit { task_id } => commands::edit(&storage, task_id),
         Commands::Show { task_id } => commands::show(&storage, task_id),
@@ -291,5 +300,11 @@ fn main() -> Result<()> {
             TemplateCommands::List => commands::templates::list(),
             TemplateCommands::Show { name } => commands::templates::show(&name),
         },
+        Commands::Completions { shell } => {
+            let mut command = Cli::command();
+            let name = command.get_name().to_owned();
+            clap_complete::generate(shell, &mut command, name, &mut std::io::stdout());
+            Ok(())
+        }
     }
 }

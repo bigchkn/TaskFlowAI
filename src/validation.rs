@@ -1,5 +1,5 @@
-use crate::storage::Storage;
 use crate::model::DesignType;
+use crate::storage::Storage;
 use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
@@ -25,7 +25,9 @@ pub fn validate_task<S: Storage>(storage: &S, project_root: &Path, task_id: &str
 
     // 3. Check Task Template
     if let Some(template_name) = task.metadata.get("template") {
-        let template_path = project_root.join(".taskflow/templates/tasks").join(format!("{}.toml", template_name));
+        let template_path = project_root
+            .join(".taskflow/templates/tasks")
+            .join(format!("{}.toml", template_name));
         if template_path.exists() {
             println!("  - Validating against template: {}", template_name);
             let content = fs::read_to_string(template_path)?;
@@ -35,18 +37,33 @@ pub fn validate_task<S: Storage>(storage: &S, project_root: &Path, task_id: &str
             for (key, _) in &template.required_metadata {
                 if let Some(value) = task.metadata.get(key) {
                     if value.trim().is_empty() {
-                        return Err(anyhow::anyhow!("Task {} is missing required metadata field: '{}'", task.id, key));
+                        return Err(anyhow::anyhow!(
+                            "Task {} is missing required metadata field: '{}'",
+                            task.id,
+                            key
+                        ));
                     }
                 } else {
-                    return Err(anyhow::anyhow!("Task {} is missing required metadata field: '{}'", task.id, key));
+                    return Err(anyhow::anyhow!(
+                        "Task {} is missing required metadata field: '{}'",
+                        task.id,
+                        key
+                    ));
                 }
             }
 
             // Check required designs
             for req in &template.required_designs {
-                let has_design = task.designs.iter().any(|d| d.design_type == req.design_type);
+                let has_design = task
+                    .designs
+                    .iter()
+                    .any(|d| d.design_type == req.design_type);
                 if !has_design {
-                    return Err(anyhow::anyhow!("Task {} is missing required design type: {:?}", task.id, req.design_type));
+                    return Err(anyhow::anyhow!(
+                        "Task {} is missing required design type: {:?}",
+                        task.id,
+                        req.design_type
+                    ));
                 }
             }
             println!("  - Template validation passed.");
@@ -56,11 +73,18 @@ pub fn validate_task<S: Storage>(storage: &S, project_root: &Path, task_id: &str
     Ok(())
 }
 
-pub fn validate_milestone<S: Storage>(storage: &S, project_root: &Path, milestone_id: &str) -> Result<()> {
+pub fn validate_milestone<S: Storage>(
+    storage: &S,
+    project_root: &Path,
+    milestone_id: &str,
+) -> Result<()> {
     let project = storage.load_project()?;
-    let ms = project.milestones.iter().find(|m| m.id == milestone_id)
+    let ms = project
+        .milestones
+        .iter()
+        .find(|m| m.id == milestone_id)
         .with_context(|| format!("Milestone {} not found", milestone_id))?;
-    
+
     println!("Validating Milestone {}: {}", ms.id, ms.name);
 
     for design in &ms.designs {
@@ -70,12 +94,20 @@ pub fn validate_milestone<S: Storage>(storage: &S, project_root: &Path, mileston
     Ok(())
 }
 
-fn validate_design_file(project_root: &Path, relative_path: &str, design_type: DesignType) -> Result<()> {
+fn validate_design_file(
+    project_root: &Path,
+    relative_path: &str,
+    design_type: DesignType,
+) -> Result<()> {
     let full_path = project_root.join(relative_path);
     println!("  - Checking {:?}: {}", design_type, relative_path);
 
     if !full_path.exists() {
-        return Err(anyhow::anyhow!("{:?} file not found at: {}", design_type, relative_path));
+        return Err(anyhow::anyhow!(
+            "{:?} file not found at: {}",
+            design_type,
+            relative_path
+        ));
     }
 
     let content = fs::read_to_string(&full_path)?;

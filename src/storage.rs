@@ -1,19 +1,19 @@
 use crate::model::{Project, Task, TaskFragment};
-use anyhow::{Result, Context};
-use std::path::PathBuf;
-use std::fs;
+use anyhow::{Context, Result};
 use indexmap::IndexMap;
+use std::fs;
+use std::path::PathBuf;
 
 pub trait Storage {
     fn load_project(&self) -> Result<Project>;
     fn save_project(&self, project: &Project) -> Result<()>;
-    
+
     fn load_fragment(&self, relative_path: &str) -> Result<TaskFragment>;
     fn save_fragment(&self, relative_path: &str, fragment: &TaskFragment) -> Result<()>;
-    
+
     fn load_active_tasks(&self) -> Result<Vec<Task>>;
     fn load_all_tasks(&self) -> Result<Vec<Task>>;
-    
+
     fn update_task<F>(&self, task_id: &str, f: F) -> Result<Task>
     where
         F: FnOnce(&mut Task) -> Result<()>;
@@ -59,8 +59,8 @@ impl Storage for FileStorage {
         }
         let content = fs::read_to_string(&path)
             .with_context(|| format!("Failed to read index at {:?}", path))?;
-        let project: Project = toml::from_str(&content)
-            .with_context(|| "Failed to parse index TOML")?;
+        let project: Project =
+            toml::from_str(&content).with_context(|| "Failed to parse index TOML")?;
         Ok(project)
     }
 
@@ -99,15 +99,15 @@ impl Storage for FileStorage {
     fn load_active_tasks(&self) -> Result<Vec<Task>> {
         let project = self.load_project()?;
         let mut tasks = Vec::new();
-        
+
         let backlog = self.load_fragment(&project.backlog_path)?;
         tasks.extend(backlog.tasks);
-        
+
         for ms in &project.milestones {
             let fragment = self.load_fragment(&ms.path)?;
             tasks.extend(fragment.tasks);
         }
-        
+
         Ok(tasks)
     }
 
@@ -119,7 +119,7 @@ impl Storage for FileStorage {
             let fragment = self.load_fragment(&ms.path)?;
             all_tasks.extend(fragment.tasks);
         }
-        
+
         Ok(all_tasks)
     }
 
@@ -128,7 +128,7 @@ impl Storage for FileStorage {
         F: FnOnce(&mut Task) -> Result<()>,
     {
         let project = self.load_project()?;
-        
+
         // Check backlog
         let mut backlog = self.load_fragment(&project.backlog_path)?;
         if let Some(task) = backlog.tasks.iter_mut().find(|t| t.id == task_id) {
@@ -137,7 +137,7 @@ impl Storage for FileStorage {
             self.save_fragment(&project.backlog_path, &backlog)?;
             return Ok(updated_task);
         }
-        
+
         // Check milestones
         for ms in &project.milestones {
             let mut fragment = self.load_fragment(&ms.path)?;
@@ -148,8 +148,11 @@ impl Storage for FileStorage {
                 return Ok(updated_task);
             }
         }
-        
-        Err(anyhow::anyhow!("Task {} not found (or is archived)", task_id))
+
+        Err(anyhow::anyhow!(
+            "Task {} not found (or is archived)",
+            task_id
+        ))
     }
 
     fn update_milestone<F>(&self, milestone_id: &str, f: F) -> Result<()>

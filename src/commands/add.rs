@@ -1,5 +1,5 @@
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::{Context, Result};
 use std::env;
 
@@ -30,19 +30,32 @@ pub fn run<S: Storage>(
 
     // Load template if provided or configured
     let t_name = template_name.or_else(|| {
-        project.config.get("default_template")
+        project
+            .config
+            .get("default_template")
             .filter(|v| !v.trim().is_empty())
             .cloned()
     });
-    
+
     // Check if templates are forced
-    if t_name.is_none() && parent.is_none() && project.config.get("force_templates").map(|v| v == "true").unwrap_or(false) {
-        return Err(anyhow::anyhow!("Project configuration 'force_templates' is enabled. You must provide a template with --template or set a 'default_template'."));
+    if t_name.is_none()
+        && parent.is_none()
+        && project
+            .config
+            .get("force_templates")
+            .map(|v| v == "true")
+            .unwrap_or(false)
+    {
+        return Err(anyhow::anyhow!(
+            "Project configuration 'force_templates' is enabled. You must provide a template with --template or set a 'default_template'."
+        ));
     }
 
     let mut template = None;
     if let Some(name) = t_name {
-        let template_path = std::env::current_dir()?.join(".taskflow/templates/tasks").join(format!("{}.toml", name));
+        let template_path = std::env::current_dir()?
+            .join(".taskflow/templates/tasks")
+            .join(format!("{}.toml", name));
         if template_path.exists() {
             let content = std::fs::read_to_string(template_path)?;
             let t: crate::model::TaskTemplate = toml::from_str(&content)?;

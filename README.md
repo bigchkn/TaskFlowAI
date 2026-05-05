@@ -69,6 +69,14 @@ taskflow-ai sync
 taskflow-ai dashboard
 ```
 
+### Shell Completions
+```bash
+# Print a completion script for a supported shell
+taskflow-ai completions bash
+taskflow-ai completions zsh
+taskflow-ai completions fish
+```
+
 ## Project Structure
 
 - `src/model.rs`: Core data structures using `IndexMap` for deterministic serialization.

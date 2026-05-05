@@ -1,11 +1,11 @@
 use crate::model::{Design, DesignStatus, DesignType};
-use crate::storage::Storage;
 use crate::roadmap;
+use crate::storage::Storage;
 use anyhow::Result;
-use std::env;
-use std::path::PathBuf;
-use std::fs;
 use chrono::Utc;
+use std::env;
+use std::fs;
+use std::path::PathBuf;
 
 pub fn init<S: Storage>(
     storage: &S,
@@ -23,15 +23,22 @@ pub fn init<S: Storage>(
     if let Some(ref t_id) = task {
         relative_path.push(t_id);
     }
-    let filename = format!("{}-{}.md", design_type.to_lowercase(), title.to_lowercase().replace(" ", "-"));
+    let filename = format!(
+        "{}-{}.md",
+        design_type.to_lowercase(),
+        title.to_lowercase().replace(" ", "-")
+    );
     relative_path.push(filename);
-    
+
     let full_path = project_root.join(&relative_path);
     if !full_path.exists() {
         if let Some(parent) = full_path.parent() {
             fs::create_dir_all(parent)?;
         }
-        let template_path = project_root.join(format!(".taskflow/templates/designs/{}.md", design_type.to_lowercase()));
+        let template_path = project_root.join(format!(
+            ".taskflow/templates/designs/{}.md",
+            design_type.to_lowercase()
+        ));
         let mut content = if template_path.exists() {
             fs::read_to_string(template_path)?
         } else {
@@ -63,7 +70,15 @@ pub fn init<S: Storage>(
         })?;
     }
     roadmap::generate_roadmaps(storage, &project_root)?;
-    println!("Registered design for {} {}", if task.is_some() { "task" } else { "milestone" }, if let Some(ref t_id) = task { t_id } else { &milestone });
+    println!(
+        "Registered design for {} {}",
+        if task.is_some() { "task" } else { "milestone" },
+        if let Some(ref t_id) = task {
+            t_id
+        } else {
+            &milestone
+        }
+    );
     Ok(())
 }
 
@@ -84,7 +99,11 @@ pub fn set_status<S: Storage>(
                 t.updated_at = now;
                 Ok(())
             } else {
-                Err(anyhow::anyhow!("Design not found at path {} in task {}", path, t_id))
+                Err(anyhow::anyhow!(
+                    "Design not found at path {} in task {}",
+                    path,
+                    t_id
+                ))
             }
         })?;
     } else {
@@ -94,7 +113,11 @@ pub fn set_status<S: Storage>(
                 d.updated_at = now;
                 Ok(())
             } else {
-                Err(anyhow::anyhow!("Design not found at path {} in milestone {}", path, milestone))
+                Err(anyhow::anyhow!(
+                    "Design not found at path {} in milestone {}",
+                    path,
+                    milestone
+                ))
             }
         })?;
     }
@@ -105,7 +128,10 @@ pub fn set_status<S: Storage>(
 }
 
 pub fn templates_list() -> Result<()> {
-    println!("{:<15} | {:<20} | {:<40}", "DESIGN TYPE", "LOCAL TEMPLATE", "REQUIRED HEADERS COUNT");
+    println!(
+        "{:<15} | {:<20} | {:<40}",
+        "DESIGN TYPE", "LOCAL TEMPLATE", "REQUIRED HEADERS COUNT"
+    );
     println!("{}", "-".repeat(80));
 
     for d_type in [DesignType::Hld, DesignType::Lld, DesignType::Rfc] {
@@ -115,10 +141,19 @@ pub fn templates_list() -> Result<()> {
             DesignType::Rfc => "rfc",
         };
         let template_path = format!(".taskflow/templates/designs/{}.md", type_str);
-        let local_status = if std::path::Path::new(&template_path).exists() { "Present" } else { "Missing (Using Hardcoded)" };
+        let local_status = if std::path::Path::new(&template_path).exists() {
+            "Present"
+        } else {
+            "Missing (Using Hardcoded)"
+        };
         let req_count = d_type.required_headers().len();
-        
-        println!("{:<15} | {:<20} | {:<40}", type_str.to_uppercase(), local_status, req_count);
+
+        println!(
+            "{:<15} | {:<20} | {:<40}",
+            type_str.to_uppercase(),
+            local_status,
+            req_count
+        );
     }
     Ok(())
 }
@@ -126,11 +161,11 @@ pub fn templates_list() -> Result<()> {
 pub fn templates_show(design_type: &str) -> Result<()> {
     let d_type = parse_design_type(design_type)?;
     let type_str = design_type.to_lowercase();
-    
+
     println!("--------------------------------------------------");
     println!("DESIGN TEMPLATE: {}", type_str.to_uppercase());
     println!("--------------------------------------------------");
-    
+
     println!("REQUIRED HEADERS (Validation Enforced):");
     let headers = d_type.required_headers();
     if headers.is_empty() {
@@ -141,10 +176,13 @@ pub fn templates_show(design_type: &str) -> Result<()> {
         }
     }
     println!("--------------------------------------------------");
-    
+
     let template_path = format!(".taskflow/templates/designs/{}.md", type_str);
     if std::path::Path::new(&template_path).exists() {
-        println!("LOCAL SCAFFOLDING TEMPLATE (.taskflow/templates/designs/{}.md):", type_str);
+        println!(
+            "LOCAL SCAFFOLDING TEMPLATE (.taskflow/templates/designs/{}.md):",
+            type_str
+        );
         let content = fs::read_to_string(&template_path)?;
         println!("\n{}", content.trim());
     } else {
