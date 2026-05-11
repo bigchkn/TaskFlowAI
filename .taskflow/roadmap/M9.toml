@@ -11,11 +11,17 @@ subtask_uids = [
     "ce06d342-9bfc-4b7b-babd-7d806dbfb5cb",
 ]
 milestone_id = "M9"
-designs = []
 tags = []
 created_at = "2026-05-04T00:49:48.840856Z"
-updated_at = "2026-05-04T00:58:35.303102Z"
+updated_at = "2026-05-11T01:09:29.718212Z"
 completed_at = "2026-05-04T00:58:35.303102Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M9/TF-24/lld-update-taskflow-ai-skill-with-task-template-instructions.md"
+status = "approved"
+created_at = "2026-05-11T01:08:55.415587Z"
+updated_at = "2026-05-11T01:09:29.718212Z"
 
 [tasks.execution]
 agent_id = "Gemini CLI"
@@ -35,7 +41,7 @@ uid = "c2644f08-be99-4faf-b4ae-6f78b2e5da6d"
 title = "Write LLD"
 description = ""
 task_type = "research"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "882770ec-4b06-4a0f-a13b-614a407febbb"
 subtask_uids = []
@@ -43,10 +49,15 @@ milestone_id = "M9"
 designs = []
 tags = []
 created_at = "2026-05-04T00:49:48.855034Z"
-updated_at = "2026-05-04T00:49:48.855034Z"
+updated_at = "2026-05-11T01:09:33.993129Z"
+completed_at = "2026-05-11T01:09:33.993128Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini"
+start_time = "2026-05-11T01:08:55.428196Z"
+end_time = "2026-05-11T01:09:33.993128Z"
+logs = ["Wrote LLD for updating taskflow-ai skill with Task Template instructions."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -56,7 +67,7 @@ uid = "ce06d342-9bfc-4b7b-babd-7d806dbfb5cb"
 title = "Implementation"
 description = ""
 task_type = "feature"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "882770ec-4b06-4a0f-a13b-614a407febbb"
 subtask_uids = []
@@ -64,10 +75,15 @@ milestone_id = "M9"
 designs = []
 tags = []
 created_at = "2026-05-04T00:49:48.875211Z"
-updated_at = "2026-05-04T00:49:48.875211Z"
+updated_at = "2026-05-11T01:12:13.049291Z"
+completed_at = "2026-05-11T01:12:13.049291Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini"
+start_time = "2026-05-11T01:09:45.057672Z"
+end_time = "2026-05-11T01:12:13.049290Z"
+logs = ["Updated TASKFLOW_SKILL_PROMPT to include Task Templates instructions as designed."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -86,15 +102,15 @@ subtask_uids = [
 milestone_id = "M9"
 tags = []
 created_at = "2026-05-04T00:58:02.009479Z"
-updated_at = "2026-05-04T00:58:23.967559Z"
+updated_at = "2026-05-11T01:12:42.429920Z"
 completed_at = "2026-05-04T00:58:23.967559Z"
 
 [[tasks.designs]]
 design_type = "lld"
 path = "docs/designs/M9/TF-27/lld-templates-command-implementation.md"
-status = "draft"
+status = "approved"
 created_at = "2026-05-04T00:58:04.059613Z"
-updated_at = "2026-05-04T00:58:04.059613Z"
+updated_at = "2026-05-11T01:12:42.429920Z"
 
 [tasks.execution]
 agent_id = "Gemini CLI"
@@ -114,7 +130,7 @@ uid = "512c9313-0282-4bfe-872d-2ee79401d7d6"
 title = "Write LLD"
 description = ""
 task_type = "research"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "e1df6430-6377-41bf-9b8d-fbaca03b2390"
 subtask_uids = []
@@ -122,10 +138,15 @@ milestone_id = "M9"
 designs = []
 tags = []
 created_at = "2026-05-04T00:58:02.028647Z"
-updated_at = "2026-05-04T00:58:02.028647Z"
+updated_at = "2026-05-11T01:12:42.802765Z"
+completed_at = "2026-05-11T01:12:42.802765Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini"
+start_time = "2026-05-11T01:12:39.653856Z"
+end_time = "2026-05-11T01:12:42.802765Z"
+logs = ["Marked existing LLD as approved."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -135,7 +156,7 @@ uid = "b3d9ed08-bf7a-4679-8e54-4bc012b04764"
 title = "Implementation"
 description = ""
 task_type = "feature"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "e1df6430-6377-41bf-9b8d-fbaca03b2390"
 subtask_uids = []
@@ -143,9 +164,14 @@ milestone_id = "M9"
 designs = []
 tags = []
 created_at = "2026-05-04T00:58:02.054304Z"
-updated_at = "2026-05-04T00:58:02.054304Z"
+updated_at = "2026-05-11T01:12:54.687592Z"
+completed_at = "2026-05-11T01:12:54.687592Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Gemini"
+start_time = "2026-05-11T01:12:54.409612Z"
+end_time = "2026-05-11T01:12:54.687591Z"
+logs = ["Implementation already present."]
+outcome = "success"
 
 [tasks.metadata]

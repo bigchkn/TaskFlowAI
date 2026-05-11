@@ -18,18 +18,21 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 ## Standard Workflow
 1. **Discover**: 
    - Run `taskflow-ai next` to find the highest priority task and its associated designs.
-   - Run `taskflow-ai templates list` to see available task types if creating a new task.
-2. **Research & Design**:
+   - Run `taskflow-ai templates list` to see available task templates if creating a new task. Create tasks with `taskflow-ai add <Title> -T <template_name>`.
+2. **Task Templates & Requirements**:
+   - If a task uses a template, run `taskflow-ai templates show <template_name>` to view required metadata and designs.
+   - Satisfy required metadata using `taskflow-ai meta set <TF_ID> <key> <value>`.
+3. **Research & Design**:
    - Read the linked HLD/LLDs.
    - Use `taskflow-ai design templates show <type>` to view required headers for a design type.
-   - If a new design is needed, run `taskflow-ai design init <hld|lld> <Title> --milestone <M_ID> [--task <TF_ID>]`.
+   - Run `taskflow-ai design init <type> <Title> --milestone <M_ID> [--task <TF_ID>]` to create required designs.
    - Populate the scaffolded Markdown file.
-3. **Execute**:
+4. **Execute**:
    - Start: `taskflow-ai execute start <TF_ID> --agent <Agent_Name>`.
    - Implement the change.
-   - Validate: `taskflow-ai validate <TF_ID>`.
+   - Validate: `taskflow-ai validate <TF_ID>`. This MUST pass before completing the task to ensure all template requirements are met.
    - Complete: `taskflow-ai execute complete <TF_ID> --outcome success --log "Summary of work"`.
-4. **Sync**: The roadmap usually syncs automatically, but you can run `taskflow-ai sync` to be sure.
+5. **Sync**: The roadmap usually syncs automatically, but you can run `taskflow-ai sync` to be sure.
 
 ## Directory Structure
 - `.taskflow/roadmap/index.toml`: Project metadata and milestone index.
