@@ -1,1 +1,70 @@
-tasks = []
+[[tasks]]
+id = "TF-36"
+uid = "a5ba0c32-8da9-4fd4-8204-db85a08aec90"
+title = "Test Research Task"
+description = ""
+task_type = "feature"
+status = "backlog"
+priority = 0
+subtask_uids = [
+    "cfd6447e-e5cb-48a0-8cf6-12fe04c07c14",
+    "a3f28c3a-aab7-4d9a-bd01-2cc32500a895",
+]
+tags = []
+created_at = "2026-05-11T01:19:42.711226Z"
+updated_at = "2026-05-11T01:19:49.592565Z"
+
+[[tasks.designs]]
+design_type = "rfc"
+path = "docs/research/rfc-test-research-task-output.md"
+status = "draft"
+created_at = "2026-05-11T01:19:49.592565Z"
+updated_at = "2026-05-11T01:19:49.592565Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+template = "research"
+research_goal = "Test the new research workflow"
+research_path = "docs/research/"
+
+[[tasks]]
+id = "TF-37"
+uid = "cfd6447e-e5cb-48a0-8cf6-12fe04c07c14"
+title = "Initial Research & Discovery"
+description = ""
+task_type = "research"
+status = "backlog"
+priority = 0
+parent_id = "a5ba0c32-8da9-4fd4-8204-db85a08aec90"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-05-11T01:19:42.732759Z"
+updated_at = "2026-05-11T01:19:42.732759Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-38"
+uid = "a3f28c3a-aab7-4d9a-bd01-2cc32500a895"
+title = "Document Findings"
+description = ""
+task_type = "research"
+status = "backlog"
+priority = 0
+parent_id = "a5ba0c32-8da9-4fd4-8204-db85a08aec90"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-05-11T01:19:42.753492Z"
+updated_at = "2026-05-11T01:19:42.753492Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

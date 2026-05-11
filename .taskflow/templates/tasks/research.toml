@@ -1,0 +1,17 @@
+name = "Research"
+description = "Template for research, spikes, and architecture inquiries."
+
+[required_metadata]
+research_goal = "The primary question or objective of this research."
+research_path = "Suggested: docs/research/"
+
+[[required_designs]]
+design_type = "rfc"
+
+[[default_subtasks]]
+title = "Initial Research & Discovery"
+task_type = "research"
+
+[[default_subtasks]]
+title = "Document Findings"
+task_type = "research"

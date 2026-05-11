@@ -106,7 +106,13 @@ description = ""
 status = "todo"
 path = "roadmap/M10.toml"
 priority = 255
-designs = []
+
+[[milestones.designs]]
+design_type = "rfc"
+path = "docs/research/rfc-test-research.md"
+status = "draft"
+created_at = "2026-05-11T01:19:42.426881Z"
+updated_at = "2026-05-11T01:19:42.426881Z"
 
 [[archived_milestones]]
 id = "M7"

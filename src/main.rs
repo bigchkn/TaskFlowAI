@@ -167,6 +167,8 @@ enum DesignCommands {
         milestone: String,
         #[arg(short, long)]
         task: Option<String>,
+        #[arg(short, long)]
+        path: Option<String>,
     },
     /// Update the status of a design document
     Status {
@@ -273,7 +275,8 @@ fn main() -> Result<()> {
                 title,
                 milestone,
                 task,
-            } => commands::design_init(&storage, design_type, title, milestone, task),
+                path,
+            } => commands::design_init(&storage, design_type, title, milestone, task, path),
             DesignCommands::Status {
                 path,
                 status,

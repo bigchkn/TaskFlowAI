@@ -95,11 +95,20 @@
 **Priority:** 255
 **Status:** Todo
 
+**Designs:**
+- [Rfc] docs/research/rfc-test-research.md (`Draft`)
+
 - [x] **TF-30**: Design: Design Template CLI Command(`Done`)
 - [x] **TF-31**: Implementation: Design Template CLI Command(`Done`)
 - [x] **TF-32**: Update: taskflow-ai Skill Documentation(`Done`)
+- [x] **TF-33**: Support custom paths in 'design init' and add Research template(`Done`)
+  - [Lld] docs/designs/M10/TF-33/lld-support-custom-paths-in-design-init-and-research-template.md (`Approved`)
+  - [x] **TF-34**: Write LLD (Parent: TF-33)(`Done`)
+  - [x] **TF-35**: Implementation (Parent: TF-33)(`Done`)
 
 ## Backlog
 
-_Backlog is empty._
-
+- [ ] **TF-36**: Test Research Task(`Backlog`)
+  - [Rfc] docs/research/rfc-test-research-task-output.md (`Draft`)
+  - [ ] **TF-37**: Initial Research & Discovery (Parent: TF-36)(`Backlog`)
+  - [ ] **TF-38**: Document Findings (Parent: TF-36)(`Backlog`)

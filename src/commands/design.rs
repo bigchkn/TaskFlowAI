@@ -13,16 +13,22 @@ pub fn init<S: Storage>(
     title: String,
     milestone: String,
     task: Option<String>,
+    path: Option<String>,
 ) -> Result<()> {
     let d_type = parse_design_type(&design_type)?;
     let now = Utc::now();
     let project_root = env::current_dir()?;
 
-    let mut relative_path = PathBuf::from("docs/designs");
-    relative_path.push(&milestone);
-    if let Some(ref t_id) = task {
-        relative_path.push(t_id);
-    }
+    let mut relative_path = if let Some(custom_path) = path {
+        PathBuf::from(custom_path)
+    } else {
+        let mut p = PathBuf::from("docs/designs");
+        p.push(&milestone);
+        if let Some(ref t_id) = task {
+            p.push(t_id);
+        }
+        p
+    };
     let filename = format!(
         "{}-{}.md",
         design_type.to_lowercase(),

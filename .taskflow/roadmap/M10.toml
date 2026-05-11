@@ -72,3 +72,92 @@ logs = ["Updated skill documentation to include design templates command."]
 outcome = "success"
 
 [tasks.metadata]
+
+[[tasks]]
+id = "TF-33"
+uid = "a7b20849-6d84-49ca-8662-7ac894de5c5d"
+title = "Support custom paths in 'design init' and add Research template"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = [
+    "04efedca-2248-46df-887f-b3a50c462cc5",
+    "23483c00-135e-4b93-97ad-087678947ab6",
+]
+milestone_id = "M10"
+tags = []
+created_at = "2026-05-11T01:19:05.141383Z"
+updated_at = "2026-05-11T01:21:03.841170Z"
+completed_at = "2026-05-11T01:21:03.841169Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M10/TF-33/lld-support-custom-paths-in-design-init-and-research-template.md"
+status = "approved"
+created_at = "2026-05-11T01:19:12.654201Z"
+updated_at = "2026-05-11T01:19:21.477191Z"
+
+[tasks.execution]
+agent_id = "Gemini"
+start_time = "2026-05-11T01:19:23.729107Z"
+end_time = "2026-05-11T01:21:03.841169Z"
+logs = ["Fulfilled research workflow requirements."]
+outcome = "success"
+
+[tasks.metadata]
+template = "feature"
+priority_reason = ""
+impact_analysis = ""
+
+[[tasks]]
+id = "TF-34"
+uid = "04efedca-2248-46df-887f-b3a50c462cc5"
+title = "Write LLD"
+description = ""
+task_type = "research"
+status = "done"
+priority = 0
+parent_id = "a7b20849-6d84-49ca-8662-7ac894de5c5d"
+subtask_uids = []
+milestone_id = "M10"
+designs = []
+tags = []
+created_at = "2026-05-11T01:19:05.164287Z"
+updated_at = "2026-05-11T01:19:21.767546Z"
+completed_at = "2026-05-11T01:19:21.767546Z"
+
+[tasks.execution]
+agent_id = "Gemini"
+start_time = "2026-05-11T01:19:10.965691Z"
+end_time = "2026-05-11T01:19:21.767545Z"
+logs = ["Wrote and approved LLD for custom path support and research template."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-35"
+uid = "23483c00-135e-4b93-97ad-087678947ab6"
+title = "Implementation"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+parent_id = "a7b20849-6d84-49ca-8662-7ac894de5c5d"
+subtask_uids = []
+milestone_id = "M10"
+designs = []
+tags = []
+created_at = "2026-05-11T01:19:05.194447Z"
+updated_at = "2026-05-11T01:21:03.567180Z"
+completed_at = "2026-05-11T01:21:03.567179Z"
+
+[tasks.execution]
+agent_id = "Gemini"
+start_time = "2026-05-11T01:21:03.279610Z"
+end_time = "2026-05-11T01:21:03.567179Z"
+logs = ["Implemented custom path support and research template."]
+outcome = "success"
+
+[tasks.metadata]
