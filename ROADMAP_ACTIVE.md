@@ -106,6 +106,15 @@
   - [x] **TF-34**: Write LLD (Parent: TF-33)(`Done`)
   - [x] **TF-35**: Implementation (Parent: TF-33)(`Done`)
 
+### Existing Design Path Support (M11)
+**Priority:** 255
+**Status:** Todo
+
+- [x] **TF-39**: Allow design init to register existing document paths(`Done`)
+  - [Lld] docs/designs/M11/TF-39/lld-existing-design-path-support.md (`Approved`)
+  - [x] **TF-40**: Write LLD (Parent: TF-39)(`Done`)
+  - [x] **TF-41**: Implementation (Parent: TF-39)(`Done`)
+
 ## Backlog
 
 - [ ] **TF-36**: Test Research Task(`Backlog`)

@@ -5,7 +5,7 @@ use anyhow::Result;
 use chrono::Utc;
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub fn init<S: Storage>(
     storage: &S,
@@ -19,22 +19,17 @@ pub fn init<S: Storage>(
     let now = Utc::now();
     let project_root = env::current_dir()?;
 
-    let mut relative_path = if let Some(custom_path) = path {
-        PathBuf::from(custom_path)
+    let relative_path = if let Some(custom_path) = path {
+        resolve_custom_path(&custom_path, &design_type, &title)
     } else {
         let mut p = PathBuf::from("docs/designs");
         p.push(&milestone);
         if let Some(ref t_id) = task {
             p.push(t_id);
         }
+        p.push(design_filename(&design_type, &title));
         p
     };
-    let filename = format!(
-        "{}-{}.md",
-        design_type.to_lowercase(),
-        title.to_lowercase().replace(" ", "-")
-    );
-    relative_path.push(filename);
 
     let full_path = project_root.join(&relative_path);
     if !full_path.exists() {
@@ -86,6 +81,30 @@ pub fn init<S: Storage>(
         }
     );
     Ok(())
+}
+
+fn resolve_custom_path(custom_path: &str, design_type: &str, title: &str) -> PathBuf {
+    let path = PathBuf::from(custom_path);
+    if is_markdown_file_path(&path) {
+        path
+    } else {
+        path.join(design_filename(design_type, title))
+    }
+}
+
+fn is_markdown_file_path(path: &Path) -> bool {
+    path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false)
+}
+
+fn design_filename(design_type: &str, title: &str) -> String {
+    format!(
+        "{}-{}.md",
+        design_type.to_lowercase(),
+        title.to_lowercase().replace(" ", "-")
+    )
 }
 
 pub fn set_status<S: Storage>(
@@ -215,5 +234,35 @@ fn parse_design_status(s: &str) -> Result<DesignStatus> {
         "approved" => Ok(DesignStatus::Approved),
         "deprecated" => Ok(DesignStatus::Deprecated),
         _ => Err(anyhow::anyhow!("Invalid design status: {}", s)),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_custom_path;
+    use std::path::PathBuf;
+
+    #[test]
+    fn custom_path_without_markdown_extension_is_treated_as_directory() {
+        assert_eq!(
+            resolve_custom_path(
+                "docs/designs/M11/TF-39",
+                "lld",
+                "Existing Design Path Support"
+            ),
+            PathBuf::from("docs/designs/M11/TF-39/lld-existing-design-path-support.md")
+        );
+    }
+
+    #[test]
+    fn custom_markdown_path_is_treated_as_document_path() {
+        assert_eq!(
+            resolve_custom_path(
+                "docs/designs/M255/TF-136/lld-erosionapproximator.md",
+                "lld",
+                "ErosionApproximator"
+            ),
+            PathBuf::from("docs/designs/M255/TF-136/lld-erosionapproximator.md")
+        );
     }
 }

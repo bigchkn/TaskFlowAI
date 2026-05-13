@@ -1,0 +1,88 @@
+[[tasks]]
+id = "TF-39"
+uid = "29d0f24c-7d68-4361-89da-8319d939f7f2"
+title = "Allow design init to register existing document paths"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = [
+    "bec94c79-125c-4747-93e9-a227874459ad",
+    "e0886581-904c-43ed-a4c9-73d4d3a54a0a",
+]
+milestone_id = "M11"
+tags = []
+created_at = "2026-05-13T04:42:59.072136Z"
+updated_at = "2026-05-13T04:44:51.475606Z"
+completed_at = "2026-05-13T04:44:51.475606Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/M11/TF-39/lld-existing-design-path-support.md"
+status = "approved"
+created_at = "2026-05-13T04:43:10.093057Z"
+updated_at = "2026-05-13T04:43:22.954355Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-05-13T04:44:46.833541Z"
+end_time = "2026-05-13T04:44:51.475606Z"
+logs = ["Allowed design init --path to accept existing Markdown document paths while preserving directory path behavior."]
+outcome = "success"
+
+[tasks.metadata]
+template = "feature"
+priority_reason = "Unblocks agent workflows that prewrite design docs before registering them."
+impact_analysis = "Small change isolated to design init path resolution; preserves directory path behavior and adds explicit Markdown file path support."
+
+[[tasks]]
+id = "TF-40"
+uid = "bec94c79-125c-4747-93e9-a227874459ad"
+title = "Write LLD"
+description = ""
+task_type = "research"
+status = "done"
+priority = 0
+parent_id = "29d0f24c-7d68-4361-89da-8319d939f7f2"
+subtask_uids = []
+milestone_id = "M11"
+designs = []
+tags = []
+created_at = "2026-05-13T04:42:59.074954Z"
+updated_at = "2026-05-13T04:43:25.362293Z"
+completed_at = "2026-05-13T04:43:25.362293Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-05-13T04:43:07.653964Z"
+end_time = "2026-05-13T04:43:25.362293Z"
+logs = ["Wrote and approved LLD for registering existing Markdown paths with design init."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-41"
+uid = "e0886581-904c-43ed-a4c9-73d4d3a54a0a"
+title = "Implementation"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+parent_id = "29d0f24c-7d68-4361-89da-8319d939f7f2"
+subtask_uids = []
+milestone_id = "M11"
+designs = []
+tags = []
+created_at = "2026-05-13T04:42:59.078611Z"
+updated_at = "2026-05-13T04:44:44.057738Z"
+completed_at = "2026-05-13T04:44:44.057738Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-05-13T04:43:31.249032Z"
+end_time = "2026-05-13T04:44:44.057737Z"
+logs = ["Implemented explicit Markdown path handling for design init and added unit coverage."]
+outcome = "success"
+
+[tasks.metadata]
