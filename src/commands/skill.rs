@@ -1,6 +1,7 @@
 use crate::SkillCommands;
 use anyhow::{Context, Result, bail};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 pub const TASKFLOW_SKILL_PROMPT: &str = r#"---
 name: taskflow
@@ -76,29 +77,67 @@ pub fn run(command: Option<SkillCommands>) -> Result<()> {
         }
         SkillCommands::Install { provider } => {
             let home = std::env::var("HOME").context("Could not find HOME environment variable")?;
-
-            let skill_path = match provider.to_lowercase().as_str() {
-                "claude" => format!("{}/.claude/skills/taskflow/SKILL.md", home),
-                "gemini" => format!("{}/.gemini/skills/taskflow/SKILL.md", home),
-                "codex" => format!("{}/.codex/skills/taskflow/SKILL.md", home),
-                "dirac" => format!("{}/.dirac/skills/taskflow/SKILL.md", home),
-                "opencode" => format!("{}/.config/opencode/skill/taskflow/SKILL.md", home),
-                _ => bail!(
-                    "Unsupported provider: {}. Supported providers are: claude, gemini, codex, dirac, opencode",
-                    provider
-                ),
-            };
-
-            let path = std::path::Path::new(&skill_path);
+            let path = skill_path_for_provider(&provider, Path::new(&home))?;
             if let Some(parent) = path.parent() {
                 fs::create_dir_all(parent)
                     .with_context(|| format!("Failed to create directory: {:?}", parent))?;
             }
 
-            fs::write(path, TASKFLOW_SKILL_PROMPT)
+            fs::write(&path, TASKFLOW_SKILL_PROMPT)
                 .with_context(|| format!("Failed to write skill to: {:?}", path))?;
-            println!("Successfully installed TaskFlowAI skill to {}", skill_path);
+            println!(
+                "Successfully installed TaskFlowAI skill to {}",
+                path.display()
+            );
         }
     }
     Ok(())
+}
+
+const SUPPORTED_PROVIDERS: &str = "claude, gemini, codex, dirac, opencode, agents";
+
+fn skill_path_for_provider(provider: &str, home: &Path) -> Result<PathBuf> {
+    let path = match provider.to_lowercase().as_str() {
+        "claude" => home.join(".claude/skills/taskflow/SKILL.md"),
+        "gemini" => home.join(".gemini/skills/taskflow/SKILL.md"),
+        "codex" => home.join(".codex/skills/taskflow/SKILL.md"),
+        "dirac" => home.join(".dirac/skills/taskflow/SKILL.md"),
+        "opencode" => home.join(".config/opencode/skill/taskflow/SKILL.md"),
+        "agents" => home.join(".agents/skills/taskflow/SKILL.md"),
+        _ => bail!(
+            "Unsupported provider: {}. Supported providers are: {}",
+            provider,
+            SUPPORTED_PROVIDERS
+        ),
+    };
+
+    Ok(path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::skill_path_for_provider;
+    use std::path::Path;
+
+    #[test]
+    fn agents_provider_installs_to_general_agents_skill_directory() {
+        assert_eq!(
+            skill_path_for_provider("agents", Path::new("/tmp/home")).unwrap(),
+            Path::new("/tmp/home/.agents/skills/taskflow/SKILL.md")
+        );
+    }
+
+    #[test]
+    fn provider_matching_is_case_insensitive() {
+        assert_eq!(
+            skill_path_for_provider("AGENTS", Path::new("/tmp/home")).unwrap(),
+            Path::new("/tmp/home/.agents/skills/taskflow/SKILL.md")
+        );
+    }
+
+    #[test]
+    fn unsupported_provider_error_lists_agents() {
+        let error = skill_path_for_provider("unknown", Path::new("/tmp/home")).unwrap_err();
+        assert!(error.to_string().contains("agents"));
+    }
 }

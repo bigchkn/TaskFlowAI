@@ -35,7 +35,7 @@ uid = "b5d12227-9471-4650-bf59-d38ec580f5b5"
 title = "Support agents skill install target for taskflow-ai skill install"
 description = ""
 task_type = "feature"
-status = "todo"
+status = "done"
 priority = 0
 subtask_uids = [
     "1227f998-3370-4c80-8ad8-224ce0d6f97e",
@@ -43,17 +43,22 @@ subtask_uids = [
 ]
 tags = []
 created_at = "2026-05-13T05:32:22.631516Z"
-updated_at = "2026-05-13T05:33:02.063625Z"
+updated_at = "2026-05-13T05:36:26.118205Z"
+completed_at = "2026-05-13T05:36:26.118205Z"
 
 [[tasks.designs]]
 design_type = "lld"
 path = "docs/designs/M5/TF-43/lld-support-agents-skill-install-target.md"
-status = "draft"
+status = "approved"
 created_at = "2026-05-13T05:33:02.063625Z"
-updated_at = "2026-05-13T05:33:02.063625Z"
+updated_at = "2026-05-13T05:36:07.986950Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Codex"
+start_time = "2026-05-13T05:36:21.131350Z"
+end_time = "2026-05-13T05:36:26.118205Z"
+logs = ["Implemented taskflow-ai skill install agents with ~/.agents/skills/taskflow/SKILL.md destination and verified with unit tests plus a temp-HOME CLI smoke test."]
+outcome = "success"
 
 [tasks.metadata]
 template = "feature"
@@ -66,17 +71,22 @@ uid = "1227f998-3370-4c80-8ad8-224ce0d6f97e"
 title = "Write LLD"
 description = ""
 task_type = "research"
-status = "todo"
+status = "done"
 priority = 0
 parent_id = "b5d12227-9471-4650-bf59-d38ec580f5b5"
 subtask_uids = []
 designs = []
 tags = []
 created_at = "2026-05-13T05:32:22.634163Z"
-updated_at = "2026-05-13T05:32:22.634163Z"
+updated_at = "2026-05-13T05:36:15.537099Z"
+completed_at = "2026-05-13T05:36:15.537099Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Codex"
+start_time = "2026-05-13T05:36:12.015974Z"
+end_time = "2026-05-13T05:36:15.537099Z"
+logs = ["LLD created and approved for the agents skill install provider target."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -86,16 +96,21 @@ uid = "23c07631-4ee3-4dba-85cd-6a0f14242a53"
 title = "Implementation"
 description = ""
 task_type = "feature"
-status = "todo"
+status = "done"
 priority = 0
 parent_id = "b5d12227-9471-4650-bf59-d38ec580f5b5"
 subtask_uids = []
 designs = []
 tags = []
 created_at = "2026-05-13T05:32:22.636990Z"
-updated_at = "2026-05-13T05:32:22.636990Z"
+updated_at = "2026-05-13T05:36:18.471126Z"
+completed_at = "2026-05-13T05:36:18.471126Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Codex"
+start_time = "2026-05-13T05:34:23.648220Z"
+end_time = "2026-05-13T05:36:18.471126Z"
+logs = ["Implemented the agents provider install target, updated CLI help, and added unit coverage for path resolution and unsupported-provider messaging."]
+outcome = "success"
 
 [tasks.metadata]

@@ -203,7 +203,7 @@ pub enum SkillCommands {
     View,
     /// Install the skill for a specific AI provider
     Install {
-        /// The AI provider (claude, gemini, codex, dirac, opencode)
+        /// The AI provider (claude, gemini, codex, dirac, opencode, agents)
         provider: String,
     },
 }
