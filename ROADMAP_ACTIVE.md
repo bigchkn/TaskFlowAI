@@ -51,6 +51,10 @@
 
 - [x] **TF-17**: Refine skill command with view and install subcommands(`Done`)
   - [Lld] docs/designs/M5/TF-17/lld-skill-command-refinement.md (`Approved`)
+- [ ] **TF-43**: Support agents skill install target for taskflow-ai skill install(`Todo`)
+  - [Lld] docs/designs/M5/TF-43/lld-support-agents-skill-install-target.md (`Draft`)
+  - [ ] **TF-44**: Write LLD (Parent: TF-43)(`Todo`)
+  - [ ] **TF-45**: Implementation (Parent: TF-43)(`Todo`)
 
 ### Milestone Priority Support (M6)
 **Priority:** 10
