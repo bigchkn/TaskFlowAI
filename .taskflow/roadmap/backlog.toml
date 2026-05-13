@@ -68,3 +68,28 @@ updated_at = "2026-05-11T01:19:42.753492Z"
 logs = []
 
 [tasks.metadata]
+
+[[tasks]]
+id = "TF-42"
+uid = "9cd1da31-1540-41e6-8275-7062aa79cd09"
+title = "Update skill prompt to prefer taskflow-ai commands"
+description = ""
+task_type = "chore"
+status = "done"
+priority = 0
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-05-13T04:52:09.811403Z"
+updated_at = "2026-05-13T04:53:04.838333Z"
+completed_at = "2026-05-13T04:53:04.838333Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-05-13T04:52:53.251536Z"
+end_time = "2026-05-13T04:53:04.838333Z"
+logs = ["Updated TASKFLOW_SKILL_PROMPT to prohibit direct roadmap TOML edits and document the full taskflow-ai command surface."]
+outcome = "success"
+
+[tasks.metadata]
+priority = "high"

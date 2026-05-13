@@ -121,3 +121,4 @@
   - [Rfc] docs/research/rfc-test-research-task-output.md (`Draft`)
   - [ ] **TF-37**: Initial Research & Discovery (Parent: TF-36)(`Backlog`)
   - [ ] **TF-38**: Document Findings (Parent: TF-36)(`Backlog`)
+- [x] **TF-42**: Update skill prompt to prefer taskflow-ai commands(`Done`)

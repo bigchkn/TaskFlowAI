@@ -14,6 +14,7 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 1. **Metadata vs. Documentation**: Task state (status, priority, execution logs) lives in TOML fragments in `.taskflow/roadmap/`. Narrative documentation (HLDs, LLDs) lives in `docs/designs/`.
 2. **Git-Native**: All state changes must be committed to Git.
 3. **Automated Roadmaps**: `ROADMAP_ACTIVE.md` is automatically generated from the TOML fragments. Never edit it manually.
+4. **Command-Driven State**: Do not modify `.taskflow/roadmap/*.toml` files directly for task, milestone, metadata, status, design, archive, or execution changes. Use `taskflow-ai` commands so IDs, timestamps, links, and generated roadmaps stay consistent.
 
 ## Standard Workflow
 1. **Discover**: 
@@ -33,6 +34,29 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
    - Validate: `taskflow-ai validate <TF_ID>`. This MUST pass before completing the task to ensure all template requirements are met.
    - Complete: `taskflow-ai execute complete <TF_ID> --outcome success --log "Summary of work"`.
 5. **Sync**: The roadmap usually syncs automatically, but you can run `taskflow-ai sync` to be sure.
+
+## Command Reference
+- `taskflow-ai init <PROJECT_NAME>`: Initialize a TaskFlowAI project.
+- `taskflow-ai add <Title> [--task-type <type>] [--milestone <M_ID>] [--parent <TF_ID>] [--template <name>]`: Create backlog, milestone, or child tasks.
+- `taskflow-ai list [--milestone <M_ID>]`: List tasks.
+- `taskflow-ai show <TF_ID>`: Inspect a task, including metadata, designs, and execution history.
+- `taskflow-ai next`: Select the next recommended task.
+- `taskflow-ai status <TF_ID> <status>`: Change task status.
+- `taskflow-ai execute start|complete <TF_ID>`: Track task execution.
+- `taskflow-ai meta set <TF_ID> <key> <value>`: Set task metadata.
+- `taskflow-ai milestone create|edit|list ...`: Manage milestones and milestone priority.
+- `taskflow-ai move --milestone <M_ID> <TF_ID>`: Move a task between backlog and milestones.
+- `taskflow-ai delete <TF_ID>`: Delete a task through the storage layer.
+- `taskflow-ai edit <TF_ID>`: Open the supported interactive task editor when a command-specific update is unavailable.
+- `taskflow-ai design init|templates ...`: Create or inspect design documents and templates.
+- `taskflow-ai templates list|show <name>`: Inspect task templates.
+- `taskflow-ai validate <TF_ID>`: Check template and design requirements.
+- `taskflow-ai archive <M_ID>`: Archive a completed milestone.
+- `taskflow-ai sync`: Regenerate roadmap Markdown from TOML state.
+- `taskflow-ai dashboard`: Show the dashboard view.
+- `taskflow-ai config <key> [value]`: Read or update project configuration.
+- `taskflow-ai skill view|install <provider>`: View or install these agent instructions.
+- `taskflow-ai completions <shell>`: Generate shell completions.
 
 ## Directory Structure
 - `.taskflow/roadmap/index.toml`: Project metadata and milestone index.
