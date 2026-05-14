@@ -17,3 +17,10 @@
   - [x] **TF-15**: Refactor main.rs into modular command handlers (Parent: TF-13)(`Done`)
     - [Lld] docs/designs/M3/TF-15/lld-refactor-main.rs.md (`Draft`)
 
+### Polish (M12)
+**Priority:** 255
+**Status:** Todo
+
+- [x] **TF-46**: Address archive command failure mode(`Done`)
+- [x] **TF-47**: Improve next command output with IDs in brackets(`Done`)
+

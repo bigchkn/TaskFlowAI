@@ -132,6 +132,15 @@ path = "archive/M3.toml"
 priority = 0
 designs = []
 
+[[archived_milestones]]
+id = "M12"
+name = "Polish"
+description = ""
+status = "todo"
+path = "archive/M12.toml"
+priority = 255
+designs = []
+
 [config]
 default_template = "feature.toml"
 force_templates = "true"

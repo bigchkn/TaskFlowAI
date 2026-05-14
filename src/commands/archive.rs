@@ -7,11 +7,17 @@ use std::path::Path;
 
 pub fn run<S: Storage>(storage: &S, storage_root: &Path, milestone_id: String) -> Result<()> {
     let mut project = storage.load_project()?;
-    let index = project
+    let index = match project
         .milestones
         .iter()
         .position(|m| m.id == milestone_id)
-        .with_context(|| format!("Milestone {} not found in active milestones", milestone_id))?;
+    {
+        Some(idx) => idx,
+        None => {
+            eprintln!("Error: Milestone {} not found in active milestones", milestone_id);
+            std::process::exit(1);
+        }
+    };
 
     let mut ms_meta = project.milestones.remove(index);
 

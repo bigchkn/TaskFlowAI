@@ -46,13 +46,13 @@ pub fn run<S: Storage>(storage: &S) -> Result<()> {
     }
 
     if let Some((task, ms_meta)) = next_task {
-        println!(">>> Next Task: {} - {}", task.id, task.title);
+        println!(">>> Next Task: [{}] {}", task.id, task.title);
         println!(
             "Milestone: {}",
             ms_meta
                 .as_ref()
-                .map(|m| m.name.as_str())
-                .unwrap_or("Global Backlog")
+                .map(|m| format!("[{}] {}", m.id, m.name))
+                .unwrap_or_else(|| "Global Backlog".to_string())
         );
         println!("Status:    {:?}", task.status);
         println!("Priority:  {}", task.priority);
