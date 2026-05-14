@@ -4,7 +4,7 @@ mod roadmap;
 mod storage;
 mod validation;
 
-use crate::storage::FileStorage;
+use crate::storage::{FileStorage, Storage};
 use anyhow::Result;
 use clap::{CommandFactory, Parser, Subcommand};
 
@@ -232,42 +232,61 @@ fn main() -> Result<()> {
             milestone,
             parent,
             template,
-        } => commands::add(&storage, title, task_type, milestone, parent, template),
+        } => {
+            let _lock = storage.lock_exclusive()?;
+            commands::add(&storage, title, task_type, milestone, parent, template)
+        }
         Commands::List { milestone } => commands::list(&storage, milestone),
         Commands::Status {
             task_id,
             new_status,
-        } => commands::status(&storage, task_id, new_status),
+        } => {
+            let _lock = storage.lock_exclusive()?;
+            commands::status(&storage, task_id, new_status)
+        }
         Commands::Archive { milestone_id } => {
+            let _lock = storage.lock_exclusive()?;
             commands::archive(&storage, &storage_root, milestone_id)
         }
-        Commands::Sync => commands::sync(&storage),
+        Commands::Sync => {
+            let _lock = storage.lock_exclusive()?;
+            commands::sync(&storage)
+        }
         Commands::Dashboard => commands::dashboard(&storage),
         Commands::Milestone { command } => match command {
             MilestoneCommands::Create { id, name, priority } => {
+                let _lock = storage.lock_exclusive()?;
                 commands::milestone_create(&storage, id, name, priority)
             }
             MilestoneCommands::Edit { id, name, priority } => {
+                let _lock = storage.lock_exclusive()?;
                 commands::milestone_edit(&storage, id, name, priority)
             }
             MilestoneCommands::List => commands::milestone_list(&storage),
         },
         Commands::Execute { command } => match command {
             ExecuteCommands::Start { task_id, agent } => {
+                let _lock = storage.lock_exclusive()?;
                 commands::execute_start(&storage, task_id, agent)
             }
             ExecuteCommands::Complete {
                 task_id,
                 outcome,
                 log,
-            } => commands::execute_complete(&storage, task_id, outcome, log),
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::execute_complete(&storage, task_id, outcome, log)
+            }
         },
         Commands::Meta { command } => match command {
             MetaCommands::Set {
                 task_id,
                 key,
                 value,
-            } => commands::meta_set(&storage, task_id, key, value),
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::meta_set(&storage, task_id, key, value)
+            }
         },
         Commands::Design { command } => match command {
             DesignCommands::Init {
@@ -276,13 +295,19 @@ fn main() -> Result<()> {
                 milestone,
                 task,
                 path,
-            } => commands::design_init(&storage, design_type, title, milestone, task, path),
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::design_init(&storage, design_type, title, milestone, task, path)
+            }
             DesignCommands::Status {
                 path,
                 status,
                 milestone,
                 task,
-            } => commands::design_set_status(&storage, path, status, milestone, task),
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::design_set_status(&storage, path, status, milestone, task)
+            }
             DesignCommands::Templates { command } => match command {
                 DesignTemplateCommands::List => commands::design::templates_list(),
                 DesignTemplateCommands::Show { design_type } => {
@@ -294,9 +319,18 @@ fn main() -> Result<()> {
         Commands::Validate { task_id } => commands::validate(&storage, task_id),
         Commands::Next => commands::next(&storage),
         Commands::Skill { command } => commands::skill(command),
-        Commands::Move { task_id, milestone } => commands::move_task(&storage, task_id, milestone),
-        Commands::Delete { task_id } => commands::delete(&storage, task_id),
-        Commands::Edit { task_id } => commands::edit(&storage, task_id),
+        Commands::Move { task_id, milestone } => {
+            let _lock = storage.lock_exclusive()?;
+            commands::move_task(&storage, task_id, milestone)
+        }
+        Commands::Delete { task_id } => {
+            let _lock = storage.lock_exclusive()?;
+            commands::delete(&storage, task_id)
+        }
+        Commands::Edit { task_id } => {
+            let _lock = storage.lock_exclusive()?;
+            commands::edit(&storage, task_id)
+        }
         Commands::Show { task_id } => commands::show(&storage, task_id),
         Commands::Config { key, value } => commands::config(&storage, key, value),
         Commands::Templates { command } => match command {

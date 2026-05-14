@@ -1,10 +1,14 @@
 use crate::model::{Project, Task, TaskFragment};
 use anyhow::{Context, Result};
 use indexmap::IndexMap;
-use std::fs;
+use std::fs::{self, File};
 use std::path::PathBuf;
 
 pub trait Storage {
+    /// Acquire an exclusive lock on the project to prevent concurrent modifications.
+    /// The lock is released when the returned guard is dropped.
+    fn lock_exclusive(&self) -> Result<Box<dyn std::any::Any>>;
+
     fn load_project(&self) -> Result<Project>;
     fn save_project(&self, project: &Project) -> Result<()>;
 
@@ -44,6 +48,28 @@ impl FileStorage {
 }
 
 impl Storage for FileStorage {
+    fn lock_exclusive(&self) -> Result<Box<dyn std::any::Any>> {
+        let path = self.index_path();
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(&path)
+            .with_context(|| format!("Failed to open index for locking at {:?}", path))?;
+
+        let lock = Box::new(fd_lock::RwLock::new(file));
+        
+        // We leak the lock to get a 'static reference, allowing us to store the guard
+        let lock_static: &'static mut fd_lock::RwLock<File> = Box::leak(lock);
+        let guard = lock_static.write().map_err(|e| anyhow::anyhow!("Failed to acquire project lock: {}", e))?;
+        
+        Ok(Box::new(guard))
+    }
+
     fn load_project(&self) -> Result<Project> {
         let path = self.index_path();
         if !path.exists() {

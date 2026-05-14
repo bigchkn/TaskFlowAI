@@ -109,6 +109,13 @@
   - [x] **TF-40**: Write LLD (Parent: TF-39)(`Done`)
   - [x] **TF-41**: Implementation (Parent: TF-39)(`Done`)
 
+### Stability & Concurrency (M13)
+**Priority:** 200
+**Status:** Todo
+
+- [x] **TF-48**: Implement concurrency control to prevent data corruption(`Done`)
+  - [Lld] docs/designs/M13/TF-48/lld-concurrency-control-via-advisory-locking.md (`Draft`)
+
 ## Backlog
 
 - [x] **TF-36**: Test Research Task(`Done`)

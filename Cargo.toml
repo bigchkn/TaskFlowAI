@@ -18,3 +18,4 @@ anyhow = "1.0"
 directories = "5.0"
 walkdir = "2.5"
 indexmap = { version = "2.2", features = ["serde"] }
+fd-lock = "4.0"
