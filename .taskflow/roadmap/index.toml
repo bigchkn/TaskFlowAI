@@ -28,15 +28,6 @@ priority = 0
 designs = []
 
 [[milestones]]
-id = "M3"
-name = "Advanced Features"
-description = ""
-status = "todo"
-path = "roadmap/M3.toml"
-priority = 0
-designs = []
-
-[[milestones]]
 id = "M4"
 name = "Self-Hosting & Validation"
 description = ""
@@ -130,6 +121,15 @@ description = ""
 status = "todo"
 path = "archive/M7.toml"
 priority = 255
+designs = []
+
+[[archived_milestones]]
+id = "M3"
+name = "Advanced Features"
+description = ""
+status = "todo"
+path = "archive/M3.toml"
+priority = 0
 designs = []
 
 [config]

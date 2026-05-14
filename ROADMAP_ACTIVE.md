@@ -31,16 +31,6 @@
 - [x] **TF-12**: Implement 'skill' command for AI workflow instruction(`Done`)
   - [Lld] docs/designs/M2/TF-12/lld-skill-command-for-ai-instruction.md (`Draft`)
 
-### Advanced Features (M3)
-**Status:** Todo
-
-- [x] **TF-8**: Implement hierarchical subtask support (--parent flag)(`Done`)
-  - [Lld] docs/designs/M3/TF-8/lld-hierarchical-subtask-support.md (`Draft`)
-- [x] **TF-13**: Architectural Refactoring(`Done`)
-  - [ ] **TF-14**: Refactor storage layer (Parent: TF-13)(`Backlog`)
-  - [x] **TF-15**: Refactor main.rs into modular command handlers (Parent: TF-13)(`Done`)
-    - [Lld] docs/designs/M3/TF-15/lld-refactor-main.rs.md (`Draft`)
-
 ### Self-Hosting & Validation (M4)
 **Status:** Todo
 
@@ -121,8 +111,8 @@
 
 ## Backlog
 
-- [ ] **TF-36**: Test Research Task(`Backlog`)
+- [x] **TF-36**: Test Research Task(`Done`)
   - [Rfc] docs/research/rfc-test-research-task-output.md (`Draft`)
-  - [ ] **TF-37**: Initial Research & Discovery (Parent: TF-36)(`Backlog`)
-  - [ ] **TF-38**: Document Findings (Parent: TF-36)(`Backlog`)
+  - [x] **TF-37**: Initial Research & Discovery (Parent: TF-36)(`Done`)
+  - [x] **TF-38**: Document Findings (Parent: TF-36)(`Done`)
 - [x] **TF-42**: Update skill prompt to prefer taskflow-ai commands(`Done`)
