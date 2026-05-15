@@ -20,39 +20,38 @@ You are an AI agent operating within a TaskFlowAI managed project. Your goal is 
 ## Standard Workflow
 1. **Discover**: 
    - Run `taskflow-ai next` to find the highest priority task and its associated designs.
-   - Run `taskflow-ai templates list` to see available task templates if creating a new task. Create tasks with `taskflow-ai add <Title> -T <template_name>`.
+   - Run `taskflow-ai task templates list` to see available task templates if creating a new task. Create tasks with `taskflow-ai task add <Title> -T <template_name>`.
 2. **Task Templates & Requirements**:
-   - If a task uses a template, run `taskflow-ai templates show <template_name>` to view required metadata and designs.
-   - Satisfy required metadata using `taskflow-ai meta set <TF_ID> <key> <value>`.
+   - If a task uses a template, run `taskflow-ai task templates show <template_name>` to view required metadata and designs.
+   - Satisfy required metadata using `taskflow-ai task meta set <TF_ID> <key> <value>`.
 3. **Research & Design**:
    - Read the linked HLD/LLDs.
    - Use `taskflow-ai design templates show <type>` to view required headers for a design type.
    - Run `taskflow-ai design init <type> <Title> --milestone <M_ID> [--task <TF_ID>]` to create required designs.
    - Populate the scaffolded Markdown file.
 4. **Execute**:
-   - Start: `taskflow-ai execute start <TF_ID> --agent <Agent_Name>`.
+   - Start: `taskflow-ai task execute start <TF_ID> --agent <Agent_Name>`.
    - Implement the change.
-   - Validate: `taskflow-ai validate <TF_ID>`. This MUST pass before completing the task to ensure all template requirements are met.
-   - Complete: `taskflow-ai execute complete <TF_ID> --outcome success --log "Summary of work"`.
+   - Validate: `taskflow-ai task validate <TF_ID>`. This MUST pass before completing the task to ensure all template requirements are met.
+   - Complete: `taskflow-ai task execute complete <TF_ID> --outcome success --log "Summary of work"`.
 5. **Sync**: The roadmap usually syncs automatically, but you can run `taskflow-ai sync` to be sure.
 
 ## Command Reference
 - `taskflow-ai init <PROJECT_NAME>`: Initialize a TaskFlowAI project.
-- `taskflow-ai add <Title> [--task-type <type>] [--milestone <M_ID>] [--parent <TF_ID>] [--template <name>]`: Create backlog, milestone, or child tasks.
-- `taskflow-ai list [--milestone <M_ID>]`: List tasks.
-- `taskflow-ai show <TF_ID>`: Inspect a task, including metadata, designs, and execution history.
+- `taskflow-ai task add <Title> [--task-type <type>] [--milestone <M_ID>] [--parent <TF_ID>] [--template <name>]`: Create backlog, milestone, or child tasks.
+- `taskflow-ai task list [--milestone <M_ID>]`: List tasks.
+- `taskflow-ai task show <TF_ID>`: Inspect a task, including metadata, designs, and execution history.
 - `taskflow-ai next`: Select the next recommended task.
-- `taskflow-ai status <TF_ID> <status>`: Change task status.
-- `taskflow-ai execute start|complete <TF_ID>`: Track task execution.
-- `taskflow-ai meta set <TF_ID> <key> <value>`: Set task metadata.
-- `taskflow-ai milestone create|edit|list ...`: Manage milestones and milestone priority.
-- `taskflow-ai move --milestone <M_ID> <TF_ID>`: Move a task between backlog and milestones.
-- `taskflow-ai delete <TF_ID>`: Delete a task through the storage layer.
-- `taskflow-ai edit <TF_ID>`: Open the supported interactive task editor when a command-specific update is unavailable.
+- `taskflow-ai task status <TF_ID> <status>`: Change task status.
+- `taskflow-ai task execute start|complete <TF_ID>`: Track task execution.
+- `taskflow-ai task meta set <TF_ID> <key> <value>`: Set task metadata.
+- `taskflow-ai milestone create|edit|list|archive ...`: Manage milestones and milestone priority/archiving.
+- `taskflow-ai task move --milestone <M_ID> <TF_ID>`: Move a task between backlog and milestones.
+- `taskflow-ai task delete <TF_ID>`: Delete a task through the storage layer.
+- `taskflow-ai task edit <TF_ID>`: Open the supported interactive task editor when a command-specific update is unavailable.
 - `taskflow-ai design init|templates ...`: Create or inspect design documents and templates.
-- `taskflow-ai templates list|show <name>`: Inspect task templates.
-- `taskflow-ai validate <TF_ID>`: Check template and design requirements.
-- `taskflow-ai archive <M_ID>`: Archive a completed milestone.
+- `taskflow-ai task templates list|show <name>`: Inspect task templates.
+- `taskflow-ai task validate <TF_ID>`: Check template and design requirements.
 - `taskflow-ai sync`: Regenerate roadmap Markdown from TOML state.
 - `taskflow-ai dashboard`: Show the dashboard view.
 - `taskflow-ai config <key> [value]`: Read or update project configuration.

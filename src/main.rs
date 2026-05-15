@@ -24,6 +24,52 @@ enum Commands {
         #[arg(default_value = "New Project")]
         name: String,
     },
+
+    /// Task management
+    Task {
+        #[command(subcommand)]
+        command: TaskCommands,
+    },
+
+    /// Milestone management
+    Milestone {
+        #[command(subcommand)]
+        command: MilestoneCommands,
+    },
+
+    /// Design document management
+    Design {
+        #[command(subcommand)]
+        command: DesignCommands,
+    },
+
+    /// Suggest the next task to work on
+    Next,
+
+    /// Manage the TaskFlowAI agent skill
+    Skill {
+        #[command(subcommand)]
+        command: Option<SkillCommands>,
+    },
+
+    /// Sync and regenerate Markdown roadmap files
+    Sync,
+
+    /// Show project dashboard
+    Dashboard,
+
+    /// Get or set project-level configuration
+    Config { key: String, value: Option<String> },
+
+    /// Generate shell completions
+    Completions {
+        /// The shell to generate completions for
+        shell: clap_complete::Shell,
+    },
+}
+
+#[derive(Subcommand)]
+enum TaskCommands {
     /// Add a new task
     Add {
         title: String,
@@ -36,77 +82,41 @@ enum Commands {
         #[arg(short = 'T', long)]
         template: Option<String>,
     },
-    /// List all tasks
+    /// List tasks
     List {
         #[arg(short, long)]
         milestone: Option<String>,
     },
-    /// Milestone management
-    Milestone {
-        #[command(subcommand)]
-        command: MilestoneCommands,
-    },
     /// Update task status
     Status { task_id: String, new_status: String },
-    /// Execution tracking
-    Execute {
-        #[command(subcommand)]
-        command: ExecuteCommands,
-    },
-    /// Metadata management
-    Meta {
-        #[command(subcommand)]
-        command: MetaCommands,
-    },
-    /// Design document management
-    Design {
-        #[command(subcommand)]
-        command: DesignCommands,
-    },
-    /// Validate a task against its template requirements
-    Validate { task_id: String },
-
-    /// Suggest the next task to work on
-    Next,
-
-    /// Manage the TaskFlowAI agent skill
-    Skill {
-        #[command(subcommand)]
-        command: Option<SkillCommands>,
-    },
-
     /// Move a task to a specific milestone
     Move {
         task_id: String,
         #[arg(short, long)]
         milestone: String,
     },
-
     /// Delete a task
     Delete { task_id: String },
-
     /// Edit a task interactively
     Edit { task_id: String },
-
-    /// Archive a completed milestone
-    Archive { milestone_id: String },
-    /// Sync and regenerate Markdown roadmap files
-    Sync,
-    /// Show project dashboard
-    Dashboard,
     /// Show detailed information about a task
     Show { task_id: String },
-    /// Get or set project-level configuration
-    Config { key: String, value: Option<String> },
+    /// Validate a task against its template requirements
+    Validate { task_id: String },
+    /// Metadata management
+    Meta {
+        #[command(subcommand)]
+        command: MetaCommands,
+    },
+    /// Execution tracking
+    Execute {
+        #[command(subcommand)]
+        command: ExecuteCommands,
+    },
     /// Manage task templates
     Templates {
         #[command(subcommand)]
         command: TemplateCommands,
-    },
-    /// Generate shell completions
-    Completions {
-        /// The shell to generate completions for
-        shell: clap_complete::Shell,
     },
 }
 
@@ -139,6 +149,8 @@ enum MilestoneCommands {
     },
     /// List all milestones
     List,
+    /// Archive a completed milestone
+    Archive { milestone_id: String },
 }
 
 #[derive(Subcommand)]
@@ -230,33 +242,69 @@ fn main() -> Result<()> {
 
     match cli.command {
         Commands::Init { name } => commands::init(&storage, name),
-        Commands::Add {
-            title,
-            task_type,
-            milestone,
-            parent,
-            template,
-        } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::add(&storage, title, task_type, milestone, parent, template)
-        }
-        Commands::List { milestone } => commands::list(&storage, milestone),
-        Commands::Status {
-            task_id,
-            new_status,
-        } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::status(&storage, task_id, new_status)
-        }
-        Commands::Archive { milestone_id } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::archive(&storage, &storage_root, milestone_id)
-        }
-        Commands::Sync => {
-            let _lock = storage.lock_exclusive()?;
-            commands::sync(&storage)
-        }
-        Commands::Dashboard => commands::dashboard(&storage),
+        Commands::Task { command } => match command {
+            TaskCommands::Add {
+                title,
+                task_type,
+                milestone,
+                parent,
+                template,
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::add(&storage, title, task_type, milestone, parent, template)
+            }
+            TaskCommands::List { milestone } => commands::list(&storage, milestone),
+            TaskCommands::Status {
+                task_id,
+                new_status,
+            } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::status(&storage, task_id, new_status)
+            }
+            TaskCommands::Move { task_id, milestone } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::move_task(&storage, task_id, milestone)
+            }
+            TaskCommands::Delete { task_id } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::delete(&storage, task_id)
+            }
+            TaskCommands::Edit { task_id } => {
+                let _lock = storage.lock_exclusive()?;
+                commands::edit(&storage, task_id)
+            }
+            TaskCommands::Show { task_id } => commands::show(&storage, task_id),
+            TaskCommands::Validate { task_id } => commands::validate(&storage, task_id),
+            TaskCommands::Meta { command } => match command {
+                MetaCommands::Set {
+                    task_id,
+                    key,
+                    value,
+                } => {
+                    let _lock = storage.lock_exclusive()?;
+                    commands::meta_set(&storage, task_id, key, value)
+                }
+            },
+            TaskCommands::Execute { command } => match command {
+                ExecuteCommands::Start { task_id, agent } => {
+                    let _lock = storage.lock_exclusive()?;
+                    commands::execute_start(&storage, task_id, agent)
+                }
+                ExecuteCommands::Complete {
+                    task_id,
+                    outcome,
+                    log,
+                } => {
+                    let _lock = storage.lock_exclusive()?;
+                    commands::execute_complete(&storage, task_id, outcome, log)
+                }
+            },
+            TaskCommands::Templates { command } => match command {
+                TemplateCommands::List => commands::templates::list(),
+                TemplateCommands::Show { name } => commands::templates::show(&name),
+                TemplateCommands::Init => commands::templates::init(),
+            },
+        },
         Commands::Milestone { command } => match command {
             MilestoneCommands::Create { id, name, priority } => {
                 let _lock = storage.lock_exclusive()?;
@@ -267,31 +315,16 @@ fn main() -> Result<()> {
                 commands::milestone_edit(&storage, id, name, priority)
             }
             MilestoneCommands::List => commands::milestone_list(&storage),
-        },
-        Commands::Execute { command } => match command {
-            ExecuteCommands::Start { task_id, agent } => {
+            MilestoneCommands::Archive { milestone_id } => {
                 let _lock = storage.lock_exclusive()?;
-                commands::execute_start(&storage, task_id, agent)
-            }
-            ExecuteCommands::Complete {
-                task_id,
-                outcome,
-                log,
-            } => {
-                let _lock = storage.lock_exclusive()?;
-                commands::execute_complete(&storage, task_id, outcome, log)
+                commands::archive(&storage, &storage_root, milestone_id)
             }
         },
-        Commands::Meta { command } => match command {
-            MetaCommands::Set {
-                task_id,
-                key,
-                value,
-            } => {
-                let _lock = storage.lock_exclusive()?;
-                commands::meta_set(&storage, task_id, key, value)
-            }
-        },
+        Commands::Sync => {
+            let _lock = storage.lock_exclusive()?;
+            commands::sync(&storage)
+        }
+        Commands::Dashboard => commands::dashboard(&storage),
         Commands::Design { command } => match command {
             DesignCommands::Init {
                 design_type,
@@ -321,28 +354,9 @@ fn main() -> Result<()> {
             },
         },
 
-        Commands::Validate { task_id } => commands::validate(&storage, task_id),
         Commands::Next => commands::next(&storage),
         Commands::Skill { command } => commands::skill(command),
-        Commands::Move { task_id, milestone } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::move_task(&storage, task_id, milestone)
-        }
-        Commands::Delete { task_id } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::delete(&storage, task_id)
-        }
-        Commands::Edit { task_id } => {
-            let _lock = storage.lock_exclusive()?;
-            commands::edit(&storage, task_id)
-        }
-        Commands::Show { task_id } => commands::show(&storage, task_id),
         Commands::Config { key, value } => commands::config(&storage, key, value),
-        Commands::Templates { command } => match command {
-            TemplateCommands::List => commands::templates::list(),
-            TemplateCommands::Show { name } => commands::templates::show(&name),
-            TemplateCommands::Init => commands::templates::init(),
-        },
         Commands::Completions { shell } => {
             let mut command = Cli::command();
             let name = command.get_name().to_owned();

@@ -123,6 +123,13 @@
 - [x] **TF-49**: Design: Template Materialization CLI(`Done`)
 - [x] **TF-50**: Implementation: Template Materialization(`Done`)
 
+### CLI Refactoring & Consistency (M15)
+**Priority:** 150
+**Status:** Todo
+
+- [x] **TF-51**: Design: Group Task Commands under Subcommand(`Done`)
+- [x] **TF-52**: Implementation: Group Task Commands(`Done`)
+
 ## Backlog
 
 - [x] **TF-36**: Test Research Task(`Done`)

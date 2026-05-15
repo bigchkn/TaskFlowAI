@@ -132,6 +132,15 @@ path = "roadmap/M14.toml"
 priority = 100
 designs = []
 
+[[milestones]]
+id = "M15"
+name = "CLI Refactoring & Consistency"
+description = ""
+status = "todo"
+path = "roadmap/M15.toml"
+priority = 150
+designs = []
+
 [[archived_milestones]]
 id = "M7"
 name = "Super High Priority"

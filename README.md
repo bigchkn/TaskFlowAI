@@ -35,33 +35,33 @@ taskflow-ai milestone list
 ### Task Lifecycle
 ```bash
 # Add to backlog
-taskflow-ai add "Implement authentication" 
+taskflow-ai task add "Implement authentication" 
 
 # Add to specific milestone
-taskflow-ai add "Setup database" --milestone M1
+taskflow-ai task add "Setup database" --milestone M1
 
 # Update status
-taskflow-ai status TF-1 in-progress
+taskflow-ai task status TF-1 in-progress
 ```
 
 ### Execution & Metadata
 ```bash
 # Track agent activity
-taskflow-ai execute start TF-1 --agent "Gemini"
-taskflow-ai execute complete TF-1 --outcome "Success" --log "Database schema applied."
+taskflow-ai task execute start TF-1 --agent "Gemini"
+taskflow-ai task execute complete TF-1 --outcome "Success" --log "Database schema applied."
 
 # Link design docs
-taskflow-ai meta set TF-1 "lld_path" "docs/lld-auth.md"
+taskflow-ai task meta set TF-1 "lld_path" "docs/lld-auth.md"
 
 # Validate requirements
-taskflow-ai validate TF-1
+taskflow-ai task validate TF-1
 ```
 
 ### Archiving & Sync
 ```bash
 # Archive completed milestone
-taskflow-ai archive M1
-
+taskflow-ai milestone archive M1
+```
 # Manual roadmap sync (usually automatic)
 taskflow-ai sync
 

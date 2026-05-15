@@ -1,0 +1,41 @@
+[[tasks]]
+id = "TF-51"
+uid = "ee5a17a4-f7b7-4cdb-b5f3-8442af15954a"
+title = "Design: Group Task Commands under Subcommand"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M15"
+designs = []
+tags = []
+created_at = "2026-05-15T05:47:42.742145Z"
+updated_at = "2026-05-15T05:50:22.633521Z"
+completed_at = "2026-05-15T05:50:22.633522Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-52"
+uid = "7a9232be-f353-4d09-802b-f01d04e33c45"
+title = "Implementation: Group Task Commands"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = []
+milestone_id = "M15"
+designs = []
+tags = []
+created_at = "2026-05-15T05:47:43.018909Z"
+updated_at = "2026-05-15T05:50:22.927473Z"
+completed_at = "2026-05-15T05:50:22.927473Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
