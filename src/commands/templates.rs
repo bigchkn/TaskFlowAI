@@ -75,3 +75,61 @@ pub fn show(name: &str) -> Result<()> {
 
     Ok(())
 }
+
+pub fn init() -> Result<()> {
+    let template_dir = Path::new(".taskflow/templates/tasks");
+    if !template_dir.exists() {
+        fs::create_dir_all(template_dir)?;
+    }
+
+    let defaults = [
+        ("feature.toml", r#"name = "Feature"
+description = "Standard template for new features"
+
+[required_metadata]
+priority_reason = "string"
+impact_analysis = "string"
+
+[[default_subtasks]]
+title = "Write LLD"
+task_type = "research"
+
+[[default_subtasks]]
+title = "Implementation"
+task_type = "feature"
+
+[[required_designs]]
+design_type = "lld"
+"#),
+        ("research.toml", r#"name = "Research"
+description = "Template for research, spikes, and architecture inquiries."
+
+[required_metadata]
+research_goal = "The primary question or objective of this research."
+research_path = "Suggested: docs/research/"
+
+[[required_designs]]
+design_type = "rfc"
+
+[[default_subtasks]]
+title = "Initial Research & Discovery"
+task_type = "research"
+
+[[default_subtasks]]
+title = "Document Findings"
+task_type = "research"
+"#),
+    ];
+
+    for (filename, content) in defaults {
+        let path = template_dir.join(filename);
+        if path.exists() {
+            println!("Template {} is already present, skipping.", filename);
+        } else {
+            fs::write(&path, content)?;
+            println!("Materialized template: {}", filename);
+        }
+    }
+
+    Ok(())
+}

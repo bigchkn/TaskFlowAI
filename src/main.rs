@@ -116,6 +116,8 @@ enum TemplateCommands {
     List,
     /// Show details of a specific template
     Show { name: String },
+    /// Initialize default task templates in .taskflow/templates/tasks
+    Init,
 }
 
 #[derive(Subcommand)]
@@ -195,6 +197,8 @@ enum DesignTemplateCommands {
         /// The design type (hld, lld, rfc)
         design_type: String,
     },
+    /// Initialize default design templates in .taskflow/templates/designs
+    Init,
 }
 
 #[derive(Subcommand)]
@@ -313,6 +317,7 @@ fn main() -> Result<()> {
                 DesignTemplateCommands::Show { design_type } => {
                     commands::design::templates_show(&design_type)
                 }
+                DesignTemplateCommands::Init => commands::design::templates_init(),
             },
         },
 
@@ -336,6 +341,7 @@ fn main() -> Result<()> {
         Commands::Templates { command } => match command {
             TemplateCommands::List => commands::templates::list(),
             TemplateCommands::Show { name } => commands::templates::show(&name),
+            TemplateCommands::Init => commands::templates::init(),
         },
         Commands::Completions { shell } => {
             let mut command = Cli::command();

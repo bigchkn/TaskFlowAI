@@ -116,6 +116,13 @@
 - [x] **TF-48**: Implement concurrency control to prevent data corruption(`Done`)
   - [Lld] docs/designs/M13/TF-48/lld-concurrency-control-via-advisory-locking.md (`Draft`)
 
+### Template Materialization Support (M14)
+**Priority:** 100
+**Status:** Todo
+
+- [x] **TF-49**: Design: Template Materialization CLI(`Done`)
+- [x] **TF-50**: Implementation: Template Materialization(`Done`)
+
 ## Backlog
 
 - [x] **TF-36**: Test Research Task(`Done`)

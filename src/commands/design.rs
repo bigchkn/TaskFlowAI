@@ -218,6 +218,67 @@ pub fn templates_show(design_type: &str) -> Result<()> {
     Ok(())
 }
 
+pub fn templates_init() -> Result<()> {
+    let template_dir = Path::new(".taskflow/templates/designs");
+    if !template_dir.exists() {
+        fs::create_dir_all(template_dir)?;
+    }
+
+    let defaults = [
+        ("hld.md", r#"# High-Level Design: {TITLE}
+
+## 1. Introduction
+{INTRODUCTION}
+
+## 2. Goals
+{GOALS}
+
+## 3. Architecture
+{ARCHITECTURE}
+
+## 4. Components
+{COMPONENTS}
+"#),
+        ("lld.md", r#"# Low-Level Design: {TITLE}
+
+## 1. Objective
+{OBJECTIVE}
+
+## 2. Architecture
+{ARCHITECTURE}
+
+## 3. Implementation Details
+{DETAILS}
+
+## 4. Verification Plan
+{VERIFICATION}
+"#),
+        ("rfc.md", r#"# RFC: {TITLE}
+
+## 1. Objective
+{OBJECTIVE}
+
+## 2. Proposal
+{PROPOSAL}
+
+## 3. Impact
+{IMPACT}
+"#),
+    ];
+
+    for (filename, content) in defaults {
+        let path = template_dir.join(filename);
+        if path.exists() {
+            println!("Template {} is already present, skipping.", filename);
+        } else {
+            fs::write(&path, content)?;
+            println!("Materialized template: {}", filename);
+        }
+    }
+
+    Ok(())
+}
+
 fn parse_design_type(s: &str) -> Result<DesignType> {
     match s.to_lowercase().as_str() {
         "hld" => Ok(DesignType::Hld),
