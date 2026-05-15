@@ -130,6 +130,12 @@
 - [x] **TF-51**: Design: Group Task Commands under Subcommand(`Done`)
 - [x] **TF-52**: Implementation: Group Task Commands(`Done`)
 
+### Installer Enhancements (M16)
+**Priority:** 50
+**Status:** Todo
+
+- [x] **TF-53**: Implementation: Support --skill flag in install.sh(`Done`)
+
 ## Backlog
 
 - [x] **TF-36**: Test Research Task(`Done`)

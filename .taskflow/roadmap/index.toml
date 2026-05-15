@@ -141,6 +141,15 @@ path = "roadmap/M15.toml"
 priority = 150
 designs = []
 
+[[milestones]]
+id = "M16"
+name = "Installer Enhancements"
+description = ""
+status = "todo"
+path = "roadmap/M16.toml"
+priority = 50
+designs = []
+
 [[archived_milestones]]
 id = "M7"
 name = "Super High Priority"
