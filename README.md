@@ -61,7 +61,7 @@ taskflow-ai task validate TF-1
 ```bash
 # Archive completed milestone
 taskflow-ai milestone archive M1
-```
+
 # Manual roadmap sync (usually automatic)
 taskflow-ai sync
 
@@ -76,6 +76,26 @@ taskflow-ai completions bash
 taskflow-ai completions zsh
 taskflow-ai completions fish
 ```
+
+## Configuration
+
+Project configuration is stored in `.taskflow/roadmap/index.toml` and managed with `taskflow-ai config`.
+
+```bash
+# Read a value
+taskflow-ai config document_dir
+
+# Set a value
+taskflow-ai config document_dir docs/designs
+```
+
+Key configurations:
+
+- `default_template`: Template applied to new root tasks when `--template` is omitted.
+- `force_templates`: Set to `true` to require templates for new root tasks.
+- `document_dir`: Directory used by `taskflow-ai design init` when `--path` is omitted. Defaults to `docs/designs`.
+- `roadmap_active_path`: Output path for the active roadmap. Defaults to `ROADMAP_ACTIVE.md`.
+- `roadmap_archive_path`: Output path for the archived roadmap. Defaults to `ROADMAP_ARCHIVE.md`.
 
 ## Templates
 

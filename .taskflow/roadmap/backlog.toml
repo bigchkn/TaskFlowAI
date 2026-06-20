@@ -176,3 +176,89 @@ updated_at = "2026-06-20T13:49:20.289198Z"
 logs = []
 
 [tasks.metadata]
+
+[[tasks]]
+id = "TF-57"
+uid = "b3bdd65d-d093-463d-b8c8-535cfad9059f"
+title = "Make generated document paths configurable"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = [
+    "ce737d86-33ce-47cf-a853-d9c74983f203",
+    "bdb22710-b454-4e1c-8cc6-ffbae4241eec",
+]
+tags = []
+created_at = "2026-06-20T15:36:32.452642Z"
+updated_at = "2026-06-20T15:38:54.667525Z"
+completed_at = "2026-06-20T15:38:54.667525Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/backlog/TF-57/lld-configurable-generated-document-paths.md"
+status = "draft"
+created_at = "2026-06-20T15:36:40.784081Z"
+updated_at = "2026-06-20T15:36:40.784081Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-06-20T15:38:54.661330Z"
+end_time = "2026-06-20T15:38:54.667524Z"
+logs = ["Created task, design, implementation, tests, and README documentation for configurable generated document paths."]
+outcome = "success"
+
+[tasks.metadata]
+template = "feature"
+priority_reason = "Configurable document and roadmap output paths unblock teams that keep generated docs outside the repository root defaults."
+impact_analysis = "Touches config lookup, design document scaffolding, roadmap generation, and README documentation; defaults must preserve existing docs/designs, ROADMAP_ACTIVE.md, and ROADMAP_ARCHIVE.md behavior."
+
+[[tasks]]
+id = "TF-58"
+uid = "ce737d86-33ce-47cf-a853-d9c74983f203"
+title = "Write LLD"
+description = ""
+task_type = "research"
+status = "done"
+priority = 0
+parent_id = "b3bdd65d-d093-463d-b8c8-535cfad9059f"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-20T15:36:32.455683Z"
+updated_at = "2026-06-20T15:38:54.648138Z"
+completed_at = "2026-06-20T15:38:54.648138Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-06-20T15:38:54.640599Z"
+end_time = "2026-06-20T15:38:54.648138Z"
+logs = ["Wrote LLD for configurable generated document paths."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-59"
+uid = "bdb22710-b454-4e1c-8cc6-ffbae4241eec"
+title = "Implementation"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+parent_id = "b3bdd65d-d093-463d-b8c8-535cfad9059f"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-20T15:36:32.459194Z"
+updated_at = "2026-06-20T15:38:54.654994Z"
+completed_at = "2026-06-20T15:38:54.654994Z"
+
+[tasks.execution]
+agent_id = "Codex"
+start_time = "2026-06-20T15:36:44.320466Z"
+end_time = "2026-06-20T15:38:54.654994Z"
+logs = ["Implemented config-backed document and roadmap paths with default fallbacks; updated README documentation."]
+outcome = "success"
+
+[tasks.metadata]

@@ -1,3 +1,4 @@
+use crate::config_paths;
 use crate::model::{Design, DesignStatus, DesignType};
 use crate::roadmap;
 use crate::storage::Storage;
@@ -18,11 +19,12 @@ pub fn init<S: Storage>(
     let d_type = parse_design_type(&design_type)?;
     let now = Utc::now();
     let project_root = env::current_dir()?;
+    let project = storage.load_project()?;
 
     let relative_path = if let Some(custom_path) = path {
         resolve_custom_path(&custom_path, &design_type, &title)
     } else {
-        let mut p = PathBuf::from("docs/designs");
+        let mut p = config_paths::document_dir(&project);
         p.push(&milestone);
         if let Some(ref t_id) = task {
             p.push(t_id);

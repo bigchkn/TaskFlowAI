@@ -1,8 +1,9 @@
+use crate::config_paths;
 use crate::model::Status;
 use crate::storage::Storage;
 use anyhow::Result;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result<()> {
     let project = storage.load_project()?;
@@ -107,7 +108,10 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
         }
     }
 
-    fs::write(project_root.join("ROADMAP_ACTIVE.md"), active_md)?;
+    write_markdown(
+        config_paths::roadmap_active_path(project_root, &project),
+        active_md,
+    )?;
 
     // 2. Generate ROADMAP_ARCHIVE.md
     let mut archive_md = format!("# Project Archive: {}\n\n", project.name);
@@ -168,7 +172,20 @@ pub fn generate_roadmaps<S: Storage>(storage: &S, project_root: &Path) -> Result
         }
     }
 
-    fs::write(project_root.join("ROADMAP_ARCHIVE.md"), archive_md)?;
+    write_markdown(
+        config_paths::roadmap_archive_path(project_root, &project),
+        archive_md,
+    )?;
 
+    Ok(())
+}
+
+fn write_markdown(path: PathBuf, content: String) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        if !parent.as_os_str().is_empty() {
+            fs::create_dir_all(parent)?;
+        }
+    }
+    fs::write(path, content)?;
     Ok(())
 }

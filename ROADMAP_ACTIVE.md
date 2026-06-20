@@ -147,3 +147,7 @@
   - [Lld] docs/designs/backlog/TF-54/lld-task-templates-do-not-show-included-templates.md (`Draft`)
   - [ ] **TF-55**: Write LLD (Parent: TF-54)(`Backlog`)
   - [ ] **TF-56**: Implementation (Parent: TF-54)(`Backlog`)
+- [x] **TF-57**: Make generated document paths configurable(`Done`)
+  - [Lld] docs/designs/backlog/TF-57/lld-configurable-generated-document-paths.md (`Draft`)
+  - [x] **TF-58**: Write LLD (Parent: TF-57)(`Done`)
+  - [x] **TF-59**: Implementation (Parent: TF-57)(`Done`)

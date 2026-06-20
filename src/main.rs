@@ -1,4 +1,5 @@
 mod commands;
+mod config_paths;
 mod model;
 mod roadmap;
 mod storage;
