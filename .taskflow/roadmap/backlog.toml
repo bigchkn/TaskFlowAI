@@ -100,3 +100,79 @@ outcome = "success"
 
 [tasks.metadata]
 priority = "high"
+
+[[tasks]]
+id = "TF-54"
+uid = "2da46f73-ea9f-460f-aac5-3426ecd99294"
+title = "Task templates do not show included templates"
+description = "design templates list command shows pre-built ones and if they are from local or not. Current does not."
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = [
+    "de8901cc-44a7-446d-9feb-87a90cae79d5",
+    "94f3a6c4-d592-49af-8298-d2e8843f41d2",
+]
+tags = []
+created_at = "2026-06-20T13:49:20.211638Z"
+updated_at = "2026-06-20T13:50:41.335682Z"
+completed_at = "2026-06-20T13:50:41.335681Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/backlog/TF-54/lld-task-templates-do-not-show-included-templates.md"
+status = "draft"
+created_at = "2026-06-20T13:49:23.914645Z"
+updated_at = "2026-06-20T13:49:23.914645Z"
+
+[tasks.execution]
+agent_id = "Antigravity"
+start_time = "2026-06-20T13:49:25.536139Z"
+end_time = "2026-06-20T13:50:41.335681Z"
+logs = ["Implemented built-in task template fallbacks and overrides, updated templates commands, and fixed default template recursion"]
+outcome = "success"
+
+[tasks.metadata]
+template = "feature.toml"
+priority_reason = "Crucial feature for offline/initial developer usability"
+impact_analysis = "Updates task templates list/show lookup with built-in fallbacks"
+
+[[tasks]]
+id = "TF-55"
+uid = "de8901cc-44a7-446d-9feb-87a90cae79d5"
+title = "Write LLD"
+description = ""
+task_type = "research"
+status = "backlog"
+priority = 0
+parent_id = "2da46f73-ea9f-460f-aac5-3426ecd99294"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-20T13:49:20.247775Z"
+updated_at = "2026-06-20T13:49:20.247775Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-56"
+uid = "94f3a6c4-d592-49af-8298-d2e8843f41d2"
+title = "Implementation"
+description = ""
+task_type = "feature"
+status = "backlog"
+priority = 0
+parent_id = "2da46f73-ea9f-460f-aac5-3426ecd99294"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-20T13:49:20.289198Z"
+updated_at = "2026-06-20T13:49:20.289198Z"
+
+[tasks.execution]
+logs = []
+
+[tasks.metadata]

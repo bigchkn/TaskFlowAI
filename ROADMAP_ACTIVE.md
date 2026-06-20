@@ -143,3 +143,7 @@
   - [x] **TF-37**: Initial Research & Discovery (Parent: TF-36)(`Done`)
   - [x] **TF-38**: Document Findings (Parent: TF-36)(`Done`)
 - [x] **TF-42**: Update skill prompt to prefer taskflow-ai commands(`Done`)
+- [x] **TF-54**: Task templates do not show included templates(`Done`)
+  - [Lld] docs/designs/backlog/TF-54/lld-task-templates-do-not-show-included-templates.md (`Draft`)
+  - [ ] **TF-55**: Write LLD (Parent: TF-54)(`Backlog`)
+  - [ ] **TF-56**: Implementation (Parent: TF-54)(`Backlog`)

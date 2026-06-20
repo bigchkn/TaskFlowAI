@@ -25,13 +25,8 @@ pub fn validate_task<S: Storage>(storage: &S, project_root: &Path, task_id: &str
 
     // 3. Check Task Template
     if let Some(template_name) = task.metadata.get("template") {
-        let template_path = project_root
-            .join(".taskflow/templates/tasks")
-            .join(format!("{}.toml", template_name));
-        if template_path.exists() {
+        if let Some(template) = crate::commands::templates::get_template(project_root, template_name) {
             println!("  - Validating against template: {}", template_name);
-            let content = fs::read_to_string(template_path)?;
-            let template: crate::model::TaskTemplate = toml::from_str(&content)?;
 
             // Check required metadata
             for (key, _) in &template.required_metadata {

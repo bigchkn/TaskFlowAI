@@ -28,13 +28,17 @@ pub fn run<S: Storage>(
     let next_id = format!("TF-{}", max_id + 1);
     let mut task = crate::model::Task::new(next_id.clone(), title, t_type);
 
-    // Load template if provided or configured
+    // Load template if provided or configured (only for root tasks)
     let t_name = template_name.or_else(|| {
-        project
-            .config
-            .get("default_template")
-            .filter(|v| !v.trim().is_empty())
-            .cloned()
+        if parent.is_none() {
+            project
+                .config
+                .get("default_template")
+                .filter(|v| !v.trim().is_empty())
+                .cloned()
+        } else {
+            None
+        }
     });
 
     // Check if templates are forced
@@ -53,17 +57,15 @@ pub fn run<S: Storage>(
 
     let mut template = None;
     if let Some(name) = t_name {
-        let template_path = std::env::current_dir()?
-            .join(".taskflow/templates/tasks")
-            .join(format!("{}.toml", name));
-        if template_path.exists() {
-            let content = std::fs::read_to_string(template_path)?;
-            let t: crate::model::TaskTemplate = toml::from_str(&content)?;
+        let project_root = std::env::current_dir()?;
+        if let Some(t) = crate::commands::templates::get_template(&project_root, &name) {
             task.metadata.insert("template".to_string(), name.clone());
             for (k, _v) in &t.required_metadata {
                 task.metadata.insert(k.clone(), String::new());
             }
             template = Some(t);
+        } else {
+            return Err(anyhow::anyhow!("Template '{}' not found", name));
         }
     }
 
