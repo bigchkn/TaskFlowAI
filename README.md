@@ -77,6 +77,44 @@ taskflow-ai completions zsh
 taskflow-ai completions fish
 ```
 
+## Templates
+
+TaskFlowAI supports two types of templates to structure and validate your workflow: **Task Templates** and **Design Templates**.
+
+### Task Templates
+Task templates define required metadata fields, automatically scaffolded subtasks, and design requirements for a task type.
+
+* **Initialization**: Run `taskflow-ai task templates init` to write the default templates (`feature.toml`, `research.toml`) to `.taskflow/templates/tasks/`.
+* **Customization**: Create or modify TOML files directly under `.taskflow/templates/tasks/`.
+* **CLI Usage**:
+  ```bash
+  # List all available task templates
+  taskflow-ai task templates list
+
+  # Show required metadata and subtasks for a template
+  taskflow-ai task templates show feature
+
+  # Add a task using a template
+  taskflow-ai task add "New Endpoint" -T feature
+  ```
+
+### Design Templates
+Design templates provide standard Markdown structure for design files (HLDs, LLDs, RFCs) and enforce specific headers during validation.
+
+* **Initialization**: Run `taskflow-ai design templates init` to write defaults (`hld.md`, `lld.md`, `rfc.md`) to `.taskflow/templates/designs/`.
+* **Customization**: Create or edit Markdown files directly under `.taskflow/templates/designs/`.
+* **CLI Usage**:
+  ```bash
+  # List design templates and check if local files exist
+  taskflow-ai design templates list
+
+  # Show required headers and template layout
+  taskflow-ai design templates show lld
+
+  # Scaffold a design doc linked to a milestone or task
+  taskflow-ai design init lld "Database Schema" --milestone M1 --task TF-1
+  ```
+
 ## Project Structure
 
 - `src/model.rs`: Core data structures using `IndexMap` for deterministic serialization.
