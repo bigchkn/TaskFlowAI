@@ -143,17 +143,22 @@ uid = "de8901cc-44a7-446d-9feb-87a90cae79d5"
 title = "Write LLD"
 description = ""
 task_type = "research"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "2da46f73-ea9f-460f-aac5-3426ecd99294"
 subtask_uids = []
 designs = []
 tags = []
 created_at = "2026-06-20T13:49:20.247775Z"
-updated_at = "2026-06-20T13:49:20.247775Z"
+updated_at = "2026-06-21T20:18:23.037006Z"
+completed_at = "2026-06-21T20:18:23.037006Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Antigravity"
+start_time = "2026-06-21T20:18:14.445284Z"
+end_time = "2026-06-21T20:18:23.037005Z"
+logs = ["Verified that the LLD document is complete and contains the required sections."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -163,17 +168,22 @@ uid = "94f3a6c4-d592-49af-8298-d2e8843f41d2"
 title = "Implementation"
 description = ""
 task_type = "feature"
-status = "backlog"
+status = "done"
 priority = 0
 parent_id = "2da46f73-ea9f-460f-aac5-3426ecd99294"
 subtask_uids = []
 designs = []
 tags = []
 created_at = "2026-06-20T13:49:20.289198Z"
-updated_at = "2026-06-20T13:49:20.289198Z"
+updated_at = "2026-06-21T20:19:06.011737Z"
+completed_at = "2026-06-21T20:19:06.011737Z"
 
 [tasks.execution]
-logs = []
+agent_id = "Antigravity"
+start_time = "2026-06-21T20:18:52.880674Z"
+end_time = "2026-06-21T20:19:06.011736Z"
+logs = ["Verified that templates are correctly listed as Built-in, Local, or Local Override, and fallbacks work seamlessly when the local templates directory is missing."]
+outcome = "success"
 
 [tasks.metadata]
 
@@ -259,6 +269,92 @@ agent_id = "Codex"
 start_time = "2026-06-20T15:36:44.320466Z"
 end_time = "2026-06-20T15:38:54.654994Z"
 logs = ["Implemented config-backed document and roadmap paths with default fallbacks; updated README documentation."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-60"
+uid = "d5a81faf-092c-49ca-adb4-131eb8843651"
+title = "Create built-in task type task which does not strictly require LLD to capture defined work items"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+subtask_uids = [
+    "a9bfd2c8-3596-4acd-84e2-18215ade3680",
+    "212bd7eb-bd75-4ba2-95e5-86840a459818",
+]
+tags = []
+created_at = "2026-06-21T19:45:51.766642Z"
+updated_at = "2026-06-21T20:20:03.644170Z"
+completed_at = "2026-06-21T20:20:03.644170Z"
+
+[[tasks.designs]]
+design_type = "lld"
+path = "docs/designs/Backlog/TF-60/lld-create-built-in-task-type-task-which-does-not-strictly-require-lld.md"
+status = "draft"
+created_at = "2026-06-21T20:19:13.744708Z"
+updated_at = "2026-06-21T20:19:13.744708Z"
+
+[tasks.execution]
+agent_id = "Antigravity"
+start_time = "2026-06-21T20:20:02.209875Z"
+end_time = "2026-06-21T20:20:03.644169Z"
+logs = ["Designed, implemented, and verified the built-in 'task' template. Added verification plan, validated design documents, and confirmed metadata validation works correctly."]
+outcome = "success"
+
+[tasks.metadata]
+template = "feature"
+priority_reason = "Improves developer productivity by providing a simpler template for generic tasks without design requirements."
+impact_analysis = "Adds the 'task' template to DEFAULT_TEMPLATES in src/commands/templates.rs."
+
+[[tasks]]
+id = "TF-61"
+uid = "a9bfd2c8-3596-4acd-84e2-18215ade3680"
+title = "Write LLD"
+description = ""
+task_type = "research"
+status = "done"
+priority = 0
+parent_id = "d5a81faf-092c-49ca-adb4-131eb8843651"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-21T19:45:51.772372Z"
+updated_at = "2026-06-21T20:19:28.283514Z"
+completed_at = "2026-06-21T20:19:28.283514Z"
+
+[tasks.execution]
+agent_id = "Antigravity"
+start_time = "2026-06-21T20:19:11.088294Z"
+end_time = "2026-06-21T20:19:28.283513Z"
+logs = ["Created the Low-Level Design document outlining the new built-in template named 'task', defining its objective, architecture, implementation details, and verification plan."]
+outcome = "success"
+
+[tasks.metadata]
+
+[[tasks]]
+id = "TF-62"
+uid = "212bd7eb-bd75-4ba2-95e5-86840a459818"
+title = "Implementation"
+description = ""
+task_type = "feature"
+status = "done"
+priority = 0
+parent_id = "d5a81faf-092c-49ca-adb4-131eb8843651"
+subtask_uids = []
+designs = []
+tags = []
+created_at = "2026-06-21T19:45:51.778159Z"
+updated_at = "2026-06-21T20:19:53.497865Z"
+completed_at = "2026-06-21T20:19:53.497865Z"
+
+[tasks.execution]
+agent_id = "Antigravity"
+start_time = "2026-06-21T20:19:32.013173Z"
+end_time = "2026-06-21T20:19:53.497864Z"
+logs = ["Implemented the new built-in template 'task' in DEFAULT_TEMPLATES in src/commands/templates.rs, supporting local override, listing, showing, and task addition."]
 outcome = "success"
 
 [tasks.metadata]

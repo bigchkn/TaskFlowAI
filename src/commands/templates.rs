@@ -54,6 +54,20 @@ title = "Document Findings"
 task_type = "research"
 "#,
     },
+    DefaultTemplate {
+        name: "task",
+        filename: "task.toml",
+        content: r#"name = "Task"
+description = "Standard template for general tasks without design requirements"
+
+[required_metadata]
+priority_reason = "string"
+
+[[default_subtasks]]
+title = "Implementation"
+task_type = "feature"
+"#,
+    },
 ];
 
 pub fn get_template(project_root: &Path, name: &str) -> Option<TaskTemplate> {

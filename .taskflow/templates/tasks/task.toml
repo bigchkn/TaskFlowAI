@@ -1,0 +1,9 @@
+name = "Task"
+description = "Standard template for general tasks without design requirements"
+
+[required_metadata]
+priority_reason = "string"
+
+[[default_subtasks]]
+title = "Implementation"
+task_type = "feature"
